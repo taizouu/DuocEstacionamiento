@@ -1,0 +1,59 @@
+.historial-container {
+  padding: 30px;
+  background-color: #f7fafc;
+  min-height: 80vh;
+}
+
+.titulo-seccion {
+  color: #002D5C;
+  border-bottom: 2px solid #FFB500;
+  display: inline-block;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+
+.tabla-responsive {
+  overflow-x: auto;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.tabla-duoc {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  font-size: 13px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Encabezados Azules como la imagen */
+.tabla-duoc thead tr {
+  background-color: #8db4e2; /* Azul claro similar a la imagen */
+  color: black;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid #002D5C;
+}
+
+.tabla-duoc th, .tabla-duoc td {
+  padding: 12px 15px;
+  border: 1px solid #e2e8f0;
+}
+
+.tabla-duoc th {
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.tabla-duoc tbody tr:nth-of-type(even) {
+  background-color: #f8f9fa; /* Filas alternas */
+}
+
+.tabla-duoc tbody tr:hover {
+  background-color: #ebf8ff;
+}
+
+/* Utilitarios */
+.text-center { text-align: center; }
+.font-bold { font-weight: bold; color: #002D5C; }
+.font-mono { font-family: monospace; font-size: 12px; }

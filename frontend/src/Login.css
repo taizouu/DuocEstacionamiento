@@ -1,0 +1,54 @@
+.login-container {
+  height: 100vh;
+  width: 200vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #002D5C 0%, #00152e 100%);
+}
+
+.login-box {
+  background: white;
+  padding: 50px 40px; /* Un poco más grande */
+  border-radius: 12px; /* Bordes más redondeados */
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3); /* Sombra más elegante */
+  text-align: center;
+  border-top: 5px solid #FFB500; /* Detalle amarillo Duoc arriba */
+  margin-bottom: 25vh;
+}
+
+.login-box h2 {margin-bottom: 5px; color: #002D5C; /* Azul Duoc */ font-weight: 800;}
+
+.login-box p { margin-bottom: 30px; color: #718096; font-size: 14px; }
+
+.input-group { margin-bottom: 15px; text-align: left; }
+
+.input-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #4a5568; }
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  box-sizing: border-box; 
+}
+
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  background-color: #002D5C; /* Azul Duoc */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+}
+
+.btn-login:hover { background-color: #2b6cb0; }
+
+.error-msg { color: #e53e3e; font-size: 13px; margin-bottom: 15px; }

@@ -1,0 +1,120 @@
+:root {
+  --cell-size: 32px; /* Ajustado un poco más pequeño para que quepa todo */
+  --border-color: #ffffff;
+  --bg-excel: #f0f2f5;
+  --color-libre: #00ff00;
+  --color-ocupado: #ff0000;
+  --color-azul: #cfe2f3; /* Azul Bodega exacto */
+  --text-color: #000;
+}
+
+.contenedor-principal {
+  padding: 40px;
+  background-color: white;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  justify-content: center; /* Centra todo el mapa en la pantalla */
+  overflow-x: auto;
+}
+
+/* --- LAYOUT MACRO --- */
+/* Esta es la clave: Dos grandes paneles lado a lado */
+.layout-macro {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start; /* Ambos empiezan desde arriba */
+  gap: 40px; /* El espacio blanco entre la columna 99 y la Caja Escala */
+}
+
+/* Utilitarios de Flexbox */
+.flex-col { display: flex; flex-direction: column; }
+.flex-row { display: flex; flex-direction: row; }
+
+/* --- COMPONENTES --- */
+.celda {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  cursor: pointer;
+  box-sizing: border-box; /* Asegura que el borde no sume tamaño */
+}
+
+.libre { background-color: var(--color-libre); }
+.ocupado { background-color: var(--color-ocupado); color: white; }
+.azul { 
+  background-color: var(--color-azul); 
+  border: 1px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  text-align: center;
+}
+
+.texto-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* Panel Central de Información */
+.panel-info {
+  background-color: #e6eff6; /* Azul grisáceo suave */
+  border: 1px solid white;
+  padding: 20px;
+  width: 380px;
+  margin: 0 30px; /* Espacio a los lados */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.panel-info h3 { margin-top: 0; font-size: 14px; text-decoration: underline; margin-bottom: 15px;}
+.dato-fila { display: flex; margin-bottom: 8px; font-size: 13px; }
+.dato-label { font-weight: bold; width: 70px; }
+.dato-valor { color: #2c5282; font-weight: bold; }
+
+/* Ajuste para las celdas dobles apiladas */
+.par-doble {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip-flotante {
+  position: fixed; /* Se mueve libremente por la pantalla */
+  background-color: rgba(26, 32, 44, 0.95); /* Fondo oscuro elegante */
+  color: white;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  pointer-events: none; /* CLAVE: El mouse ignora la caja para no parpadear */
+  z-index: 9999; /* Siempre encima de todo */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); /* Sombra suave */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 150px;
+  backdrop-filter: blur(4px); /* Efecto de vidrio borroso */
+}
+
+.tooltip-header {
+  border-bottom: 1px solid #4a5568;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #63b3ed; /* Azul claro para el título */
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.tooltip-label { color: #a0aec0; font-size: 11px; margin-right: 10px;}
+.tooltip-value { font-weight: bold; text-align: right;}

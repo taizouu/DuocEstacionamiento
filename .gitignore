@@ -1,0 +1,17 @@
+# .gitignore
+# 1. Archivos de sistema y entorno
+.env
+venv/
+__pycache__/
+*.pyc
+db.sqlite3
+.DS_Store
+
+# 2. Archivos de React/Node
+node_modules/
+build/
+dist/
+.eslintcache
+
+# 3. Logs y otros
+*.log
