@@ -3,7 +3,7 @@ import axios from 'axios';
 // 1. CONFIGURACIÓN BASE
 // Aquí defines la URL de tu backend una sola vez.
 const api = axios.create({
-    baseURL: 'http://192.168.3.144:8000/api', 
+    baseURL: 'http://192.168.3.144:8000/api/', 
     headers: {
         'Content-Type': 'application/json',
     },
