@@ -32,7 +32,9 @@ SECRET_KEY = 'django-insecure-hxgi2@w8*y4)w2*h463w)3bs8^juw39236nuce9fs4v!2#xry)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+# settings.py
+# Agrega la IP de tu servidor y localhost por si acaso
+ALLOWED_HOSTS = ['192.168.3.144', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'corsheaders', 
     'funcionarios',
     'mapaestacionamiento',
+    'administracion',
     'rest_framework_simplejwt',
 ]
 
@@ -146,10 +149,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+###STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",       # Tu React local
-    "http://127.0.0.1:3000",       # A veces React levanta aquí
-    # "https://tu-dominio.com",    # Futuro dominio de producción
+    "http://192.168.3.144",
+    "http://192.168.3.144:3000", # Si tu frontend corre en el puerto 3000
+    "http://localhost:3000",
 ]
+
+# Opción 2 (Rápida para probar): Permitir TODO (Cambiar a Opción 1 cuando salgas a producción real)
+# CORS_ALLOW_ALL_ORIGINS = True

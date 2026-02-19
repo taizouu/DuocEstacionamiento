@@ -1,8 +1,13 @@
 import React from 'react';
-import Mapa from './Mapa'; 
-import './PanelGuardia.css'; // Reutilizamos estilos base para el layout
+// IMPORTAMOS EL MAPA DESDE LA RUTA CORRECTA (Subiendo 2 niveles)
+import Mapa from '../../components/Mapa'; 
 
-const PanelProfesor = ({ token, usuario }) => {
+// Reutilizamos estilos base
+import './PanelGuardia.css'; 
+
+const PanelProfesor = ({ usuario }) => {
+  // Nota: Ya no necesitamos recibir 'token' manual.
+
   return (
     <div className="guardia-dashboard">
       
@@ -22,10 +27,8 @@ const PanelProfesor = ({ token, usuario }) => {
 
       {/* CONTENIDO: SOLO EL MAPA */}
       <div className="contenido-dinamico" style={{ padding: '0', height: 'calc(100vh - 110px)' }}>
-           {/* Al pasarle el token, el backend reconocerá que es un usuario logueado.
-              Dependiendo de tu regla en views.py, podrá ver (o no) los nombres en los tooltips.
-           */}
-           <Mapa token={token} />
+           {/* El componente Mapa ya sabe usar api.js internamente */}
+           <Mapa />
       </div>
     </div>
   );

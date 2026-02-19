@@ -1,29 +1,22 @@
-// src/services/authService.js
-import client from '../api/client';
+// ARREGLO 1: Cambiamos '../api' por './api' porque ahora están en la misma carpeta
+import api from './api'; 
 
-const login = async (username, password) => {
-    // Usamos 'client' en lugar de 'axios'. Ya tiene la URL base.
-    const response = await client.post('/token/', { username, password });
+// ARREGLO 2: Usamos "export const" (Exportación Nombrada)
+// Esto permite que Login.js encuentre la función "login" específicamente.
+export const login = async (username, password) => {
+    // Usamos api.post en lugar de axios directo
+    const response = await api.post('/token/', { username, password });
     
-    // Si la respuesta es correcta, guardamos los datos aquí (Centralización)
     if (response.data.access) {
         localStorage.setItem('token', response.data.access);
-        // Guardamos user_data como string
         localStorage.setItem('user_data', JSON.stringify(response.data.user_data));
     }
     
     return response.data;
 };
 
-const logout = () => {
-    localStorage.clear();
-    // Podrías agregar lógica extra aquí si fuera necesario
+export const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_data');
+    window.location.href = '/'; 
 };
-
-// Objeto exportado con las funciones
-const authService = {
-    login,
-    logout
-};
-
-export default authService;

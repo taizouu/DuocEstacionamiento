@@ -1,11 +1,11 @@
 // src/services/mapaService.js
-import client from '../api/client';
+import client from './api';
 
 // 1. OBTENER EL ESTADO DEL MAPA
 const obtenerMapa = async () => {
-    // Ya no necesitas pasar el token manualmente, client.js lo hace por ti.
     const response = await client.get('/mapa/');
-    return response.data;
+    // Ahora response.data tendrá { lugares: [...], ultimo_ingreso: {...} }
+    return response.data; 
 };
 
 // 2. LIBERAR LUGAR MANUALMENTE (Admin/Guardia)

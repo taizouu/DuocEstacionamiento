@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import mapaService from './services/mapaService'; // <--- Importamos el servicio
+import mapaService from '../services/mapaService'; 
 import './Mapa.css';
 
 const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
@@ -7,80 +7,80 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
     // --- 1. ESTADOS ---
     const [lugares, setLugares] = useState({});
     
-    // Estado para mostrar quién entró (si viene desde props)
     const [ultimoIngreso, setUltimoIngreso] = useState({
         patente: "---", nombre: "Esperando ingreso...", hora: "--:--"
     });
 
-    // Tooltip y Modal
+    // Tooltip (Pop-up) y Modal
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, id: null });
     const [modal, setModal] = useState({ abierto: false, lugarId: null, pass: "" });
 
-    // Notificar al padre si el modal está abierto (para bloquear inputs del guardia)
     useEffect(() => {
         if (alCambiarModal) alCambiarModal(modal.abierto);
     }, [modal.abierto, alCambiarModal]);
 
 
-    // --- 2. CARGA DE DATOS (REFACTORIZADO) ---
-    const cargarDatos = useCallback(async () => {
+const cargarDatos = useCallback(async () => {
         try {
-            // ¡Mira qué limpio! Sin headers, sin URLs, solo pedimos el mapa.
             const data = await mapaService.obtenerMapa();
             
-            // Transformamos el array a un objeto (Diccionario) para búsqueda rápida
+            // A. Procesamos los lugares (Ahora vienen dentro de data.lugares)
+            // IMPORTANTE: Antes 'data' era el array, ahora es 'data.lugares'
+            const listaLugares = data.lugares || []; 
             const dic = {};
-            data.forEach(l => dic[l.id_lugar] = l);
+            listaLugares.forEach(l => dic[l.id_lugar] = l);
             setLugares(dic);
+
+            // B. Procesamos el último ingreso (Para que lo vean TODOS)
+            if (data.ultimo_ingreso) {
+                // Solo actualizamos si no viene null
+                setUltimoIngreso(data.ultimo_ingreso);
+            }
 
         } catch (e) { 
             console.error("Error cargando mapa:", e); 
-            // Aquí podrías manejar errores de red si quisieras
         }
-    }, []); // Dependencias vacías: client.js maneja el token internamente
-
-    // --- 3. ACTUALIZACIÓN DE DATOS DE INGRESO (Visual) ---
+    }, []);
+    
+    // --- 3. ACTUALIZACIÓN VISUAL ---
     useEffect(() => {
         if (datosIngreso) setUltimoIngreso(datosIngreso);
     }, [datosIngreso]);
 
-    // --- 4. POLLING (Refresco automático) ---
+    // --- 4. POLLING ---
     useEffect(() => {
-        cargarDatos(); // Carga inicial
-        const intervalo = setInterval(cargarDatos, 3000); // Refresco cada 3 seg
-        return () => clearInterval(intervalo); // Limpieza al desmontar
-    }, [cargarDatos, recargar]); // Se reinicia si hay un trigger externo (pistoleo)
+        cargarDatos(); 
+        const intervalo = setInterval(cargarDatos, 3000); 
+        return () => clearInterval(intervalo); 
+    }, [cargarDatos, recargar]); 
 
 
-    // --- 5. HANDLER: LIBERAR LUGAR MANUALMENTE (REFACTORIZADO) ---
+    // --- 5. HANDLER: LIBERAR LUGAR ---
     const handleLiberarAction = async () => {
         if (!modal.pass) return alert("Clave requerida");
         
         try {
-            // Usamos el servicio para liberar
             await mapaService.liberarLugar(modal.lugarId, modal.pass);
-            
             setModal({ abierto: false, lugarId: null, pass: "" });
-            cargarDatos(); // Recarga inmediata para ver el cambio verde
+            cargarDatos(); 
             alert("✅ Lugar liberado correctamente");
-
         } catch (err) {
             console.error(err);
-            // Extraemos el mensaje de error del backend si existe
-            const errorMsg = err.response?.data?.error || "Error de autorización o conexión";
+            const errorMsg = err.response?.data?.error || "Error de autorización";
             alert("⛔ " + errorMsg);
         }
     };
 
-    // --- 6. SUB-COMPONENTES VISUALES (Celdas, Tooltips) ---
-    // (Esta parte visual se mantiene igual, solo optimizamos la Celda con memo si quisieras)
+    // --- 6. SUB-COMPONENTES (Celdas, Tooltips) ---
     
     const Celda = ({ id, w = 1, h = 1, txt = null }) => {
-        // Buscamos por ID exacto (5) o normalizado (E.5)
-        const info = lugares[id] || lugares[`E.${id}`];
+        // Normalización de ID para búsqueda segura
+        const idNormalizado = id.toString().startsWith("E.") ? id : (isNaN(id) ? `E.${id}` : `E.${id}`);
+        // Buscamos en el diccionario (intentamos ambas formas por seguridad)
+        const info = lugares[id] || lugares[idNormalizado] || lugares[`E.${id}`];
         const estaOcupado = info?.ocupado;
 
-        return (
+return (
             <div 
                 className={`celda ${estaOcupado ? 'ocupado' : 'libre'}`} 
                 style={{ 
@@ -89,12 +89,25 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
                     cursor: estaOcupado ? 'pointer' : 'default'
                 }}
                 onMouseEnter={(e) => {
-                    if (estaOcupado) setTooltip({ visible: true, x: e.clientX, y: e.clientY, id: id });
+                    if (estaOcupado) {
+                        // Si está ocupado, abrimos el tooltip
+                        setTooltip({ visible: true, x: e.clientX, y: e.clientY, id: id });
+                    } else {
+                        // CORRECCIÓN CLAVE: 
+                        // Si entro a un lugar LIBRE, fuerzo el cierre inmediato del tooltip
+                        // para evitar que quede pegada la info del auto anterior.
+                        setTooltip({ visible: false, x: 0, y: 0, id: null });
+                    }
                 }}
                 onMouseMove={(e) => {
-                    if (tooltip.visible) setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
+                    // Solo actualizamos la posición si REALMENTE hay un tooltip visible Y es un lugar ocupado.
+                    // Esto evita arrastrar el tooltip fantasma por el mapa.
+                    if (tooltip.visible && estaOcupado) {
+                        setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
+                    }
                 }}
                 onMouseLeave={() => {
+                    // Al salir, cerramos siempre por seguridad
                     setTooltip({ visible: false, x: 0, y: 0, id: null });
                 }}
                 onClick={() => estaOcupado && setModal({ abierto: true, lugarId: id, pass: "" })}
@@ -114,38 +127,68 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
         </div>
     );
 
-    // Datos para el tooltip flotante
-    const datosTooltip = (tooltip.visible && tooltip.id && lugares[tooltip.id]) 
-        ? lugares[tooltip.id].ocupado_por 
-        : null;
+    const getDatosOcupante = () => {
+        if (!tooltip.visible || !tooltip.id) return null;
+        
+        // Búsqueda robusta del lugar
+        const id = tooltip.id;
+        const info = lugares[id] || lugares[`E.${id}`];
+        
+        return info ? info.ocupado_por : null;
+    };
 
-    // --- 7. RENDERIZADO PRINCIPAL (LAYOUT) ---
+    const datosOcupante = getDatosOcupante();
+
     return (
         <div className="contenedor-principal" style={{ position: 'relative' }}>
             
-            {/* TOOLTIP FLOTANTE */}
-            {datosTooltip && (
+            {/* === POP-UP / TOOLTIP MEJORADO === */}
+            {tooltip.visible && datosOcupante && (
                 <div 
                     className="tooltip-flotante" 
                     style={{ 
                         top: tooltip.y + 15, 
                         left: tooltip.x + 15, 
-                        position: 'fixed', zIndex: 3000, pointerEvents: 'none'
+                        position: 'fixed', 
+                        zIndex: 3000, 
+                        pointerEvents: 'none', // Importante para que no parpadee al mover el mouse
+                        background: 'rgba(0, 45, 92, 0.95)', // Azul Duoc oscuro semi-transparente
+                        color: 'white',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                        minWidth: '180px',
+                        fontSize: '13px',
+                        backdropFilter: 'blur(4px)'
                     }}
                 >
-                    <div className="tooltip-header">Ocupado por</div>
-                    <div className="tooltip-row">
-                        <span className="tooltip-label">Nombre:</span>
-                        <span className="tooltip-value">{datosTooltip.nombre}</span>
+                    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.3)', paddingBottom: '5px', marginBottom: '5px', fontWeight: 'bold', textTransform: 'uppercase', color: '#FFB500' }}>
+                        Estacionamiento {tooltip.id}
                     </div>
-                    <div className="tooltip-row">
-                        <span className="tooltip-label">RUT:</span>
-                        <span className="tooltip-value">{datosTooltip.rut}</span>
+                    
+                    <div style={{ marginBottom: '4px' }}>
+                        <span style={{ opacity: 0.7 }}>Nombre:</span> <br/>
+                        <strong>{datosOcupante.nombre}</strong>
                     </div>
-                     <div className="tooltip-row">
-                        <span className="tooltip-label">Patente:</span>
-                        <span className="tooltip-value">{datosTooltip.ppu || "---"}</span>
+                    
+                    <div style={{ marginBottom: '4px' }}>
+                        <span style={{ opacity: 0.7 }}>Cargo:</span> <br/>
+                        <span style={{ background: 'white', color: '#002D5C', padding: '1px 5px', borderRadius: '3px', fontWeight: 'bold', fontSize: '11px' }}>
+                            {datosOcupante.cargo || 'Visita'}
+                        </span>
                     </div>
+
+                    <div style={{ marginBottom: '4px' }}>
+                        <span style={{ opacity: 0.7 }}>Patente:</span> <br/>
+                        <strong style={{ letterSpacing: '1px' }}>{datosOcupante.ppu || "---"}</strong>
+                    </div>
+
+                    {datosOcupante.destino && (
+                        <div>
+                            <span style={{ opacity: 0.7 }}>Destino:</span> <br/>
+                            <i>{datosOcupante.destino}</i>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -171,12 +214,9 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
                 </div>
             )}
 
-            {/* MAPA GRÁFICO (Mantengo tu Layout Original intacto) */}
             <div className="layout-macro">
-                {/* ... (Aquí va todo tu código de divs y Celdas que ya tienes, no lo repito para ahorrar espacio) ... */}
-                {/* SOLO PEGA AQUÍ EL BLOQUE <div className="flex-row">... QUE YA TENÍAS EN TU MAPA ORIGINAL */}
-                
-                 <div className="flex-row">
+                {/* 1. SECTOR IZQUIERDO (Bodegas y 90s) */}
+                <div className="flex-row">
                     <div className="flex-col">
                         <ZonaAzul texto="Bodegas" w={1} h={6} vertical={true} />
                         {[93,92,91,90,89,88,87,86,85,84].map(n => <Celda key={`${n}B`} id={`${n}B`} />)}
@@ -188,7 +228,9 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
                     </div>
                 </div>
 
+                {/* 2. SECTOR CENTRAL Y DERECHO */}
                 <div className="flex-col">
+                    {/* FILA SUPERIOR (1 al 22) */}
                     <div className="flex-row" style={{ alignItems: 'flex-end', marginBottom: '25px' }}>
                         <div style={{ marginRight: '20px' }}><ZonaAzul texto="Caja Escala" w={2} h={2} /></div>
                         <div className="flex-col">
@@ -209,12 +251,13 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
                         </div>
                     </div>
 
+                    {/* ZONA MEDIA (75-83 y Cuadro Info) */}
                     <div className="flex-row" style={{ alignItems: 'flex-start' }}>
                         <div className="flex-col">
                             {[83,82,81,80,79,78,77,76,75].map(n => <Celda key={n} id={String(n)} />)}
                         </div>
 
-                        {/* PANEL INFO CENTRAL */}
+                        {/* PANEL INFO CENTRAL (ESTÁTICO) */}
                         <div className="panel-info">
                             <h3>ULTIMO INGRESO</h3>
                             <div className="dato-fila">
@@ -231,6 +274,7 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
                             </div>
                         </div>
 
+                        {/* ZONA MEDIA-DERECHA (23-46) */}
                         <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: '215px' }}>
                             <div className="flex-col">
                                 {[23,24,25,26,27,28,29,30,31,32].map(n => <Celda key={n} id={String(n)} />)}
@@ -249,6 +293,7 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
                         </div>
                     </div>
 
+                    {/* FILA INFERIOR (47-73) */}
                     <div className="flex-row" style={{ marginTop: '40px' }}> 
                         {[73,72,71,70,69,68,67].map(n => <Celda key={n} id={String(n)} />)}
                         <Celda id="66" w={3} />
@@ -260,7 +305,7 @@ const Mapa = ({ datosIngreso, recargar, token, alCambiarModal }) => {
     );
 };
 
-// ESTILOS DE INGENIERÍA (Mantenemos tus estilos originales)
+// ESTILOS DE INGENIERÍA
 const styles = {
     overlay: {
         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
