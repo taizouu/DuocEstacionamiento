@@ -91,7 +91,7 @@ const PanelAdmin = ({ rolUsuario }) => {
   const cargarUsuarios = async () => {
     try {
       // ✅ CORRECCIÓN: Usamos la nueva ruta /admin/usuarios/
-      const res = await api.get('/admin/usuarios/');
+      const res = await api.get('/api/admin/usuarios/');
       setUsuarios(res.data);
     } catch (e) { console.error("Error usuarios", e); }
   };
@@ -100,7 +100,7 @@ const PanelAdmin = ({ rolUsuario }) => {
     e.preventDefault();
     try {
       // ✅ CORRECCIÓN: Usamos la nueva ruta /admin/usuarios/
-      await api.post('/admin/usuarios/', nuevoUser);
+      await api.post('/api/admin/usuarios/', nuevoUser);
       alert(`Usuario ${nuevoUser.username} creado con éxito`);
       setNuevoUser({ username: '', password: '', first_name: '', last_name: '', rol: 'Guardia' });
       cargarUsuarios(); 
@@ -111,7 +111,7 @@ const PanelAdmin = ({ rolUsuario }) => {
       if(!window.confirm(`¿Estás seguro de eliminar a ${nombre}?`)) return;
       try {
         // ✅ CORRECCIÓN: Usamos la nueva ruta /admin/usuarios/
-        await api.delete('/admin/usuarios/', { params: { id: id } });
+        await api.delete('/api/admin/usuarios/', { params: { id: id } });
         cargarUsuarios(); 
       } catch (err) { alert(err.response?.data?.error || "Error al eliminar"); }
   };
@@ -353,7 +353,7 @@ const PanelAdmin = ({ rolUsuario }) => {
                       if(!val || val.length < 4) return alert("Mínimo 4 caracteres");
                       try {
                         // ✅ CORRECCIÓN: Usamos la nueva ruta /admin/config/clave/
-                        await api.post('/admin/config/clave/', { nueva_clave: val });
+                        await api.post('/api/admin/config/clave/', { nueva_clave: val });
                         alert("Clave actualizada"); setMostrarConfig(false);
                       } catch(e) { alert("Error al actualizar"); }
                 }} style={btnConfirmModalStyle}>Guardar</button>
@@ -386,7 +386,7 @@ const PanelAdmin = ({ rolUsuario }) => {
 
                     try {
                         // ✅ CORRECCIÓN: Ya funciona bien con la ruta existente en mapa, pero requiere clave que vive en admin
-                        await api.post('/cambiar-lugar/', { lugar_origen: o, lugar_destino: d, password: p });
+                        await api.post('/api/cambiar-lugar/', { lugar_origen: o, lugar_destino: d, password: p });
                         alert("✅ Vehículo movido exitosamente"); 
                         setMostrarMover(false); 
                         setTriggerGeneral(t => t+1);
