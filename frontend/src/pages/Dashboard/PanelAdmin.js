@@ -129,7 +129,7 @@ const PanelAdmin = ({ rolUsuario }) => {
             payload.zona = datosVisita.zona;
         }
 
-        const response = await api.post('/pistoleo/', payload);
+        const response = await api.post('/api/pistoleo/', payload);
         const datos = response.data;
         
         let tipoMensaje = datos.tipo === 'entrada' ? 'exito-entrada' : 'exito-salida';

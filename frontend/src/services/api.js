@@ -3,7 +3,7 @@ import axios from 'axios';
 // 1. CONFIGURACIÓN BASE
 // Apuntamos estrictamente a la raíz del servidor.
 const api = axios.create({
-    baseURL: 'http://192.168.3.144:8000', 
+    baseURL: 'http://192.168.3.144:3000', 
     headers: {
         'Content-Type': 'application/json',
     },
