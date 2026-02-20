@@ -38,7 +38,7 @@ const PanelGuardia = () => {
   // --- FUNCIÓN PARA CARGAR LOS 5 REGISTROS ---
   const cargarUltimosRegistros = useCallback(async () => {
       try {
-          const res = await api.get('/historial/');
+          const res = await api.get('/api/historial/');
           setUltimosRegistros(res.data.slice(0, 5)); // Solo guardamos los 5 más recientes
       } catch (error) {
           console.error("Error al cargar últimos registros:", error);

@@ -17,7 +17,7 @@ const Historial = () => {
     try {
       if(registros.length === 0) setCargando(true);
       
-      const response = await api.get(`/historial/?search=${busqueda}&t=${Date.now()}`);
+      const response = await api.get(`/api/historial/?search=${busqueda}&t=${Date.now()}`);
       
       setRegistros(response.data);
       setError(null);
