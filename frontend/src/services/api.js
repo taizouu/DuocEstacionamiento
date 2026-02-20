@@ -1,23 +1,19 @@
 import axios from 'axios';
 
 // 1. CONFIGURACIÓN BASE
-// Aquí defines la URL de tu backend una sola vez.
+// Apuntamos estrictamente a la raíz del servidor.
 const api = axios.create({
-    baseURL: 'http://192.168.3.144:8000/api/', 
+    baseURL: 'http://192.168.3.144:8000', 
     headers: {
         'Content-Type': 'application/json',
     },
-    // timeout: 10000, // (Opcional) Si el servidor tarda más de 10s, cancela.
+    timeout: 10000, // Descomenta esto en producción para evitar peticiones colgadas
 });
 
 // 2. INTERCEPTOR DE SOLICITUD (REQUEST) 🛡️
-// Antes de que salga CUALQUIER petición, este código se ejecuta.
 api.interceptors.request.use(
     (config) => {
-        // Busca el token en el navegador
         const token = localStorage.getItem('token');
-        
-        // Si existe, lo pega en la cabecera Authorization
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -29,17 +25,19 @@ api.interceptors.request.use(
 );
 
 // 3. INTERCEPTOR DE RESPUESTA (RESPONSE) 🚨
-// Si el backend responde con error, lo atrapamos aquí primero.
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Si el token venció o es falso (Error 401)
-        if (error.response && error.response.status === 401) {
-            console.warn("⚠️ Sesión expirada o no autorizada.");
+        // Si el token venció, es inválido o no hay sesión (Error 401 o 403)
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            console.warn("⚠️ Sesión expirada o no autorizada. Redirigiendo al login...");
             
-            // Opcional: Si quieres que lo saque del sistema automáticamente:
-            // localStorage.clear();
-            // window.location.href = '/'; 
+            // Limpiamos el rastro de la sesión muerta
+            localStorage.removeItem('token');
+            localStorage.removeItem('user_data');
+            
+            // Forzamos la salida al monitor público/login
+            window.location.href = '/login'; 
         }
         return Promise.reject(error);
     }
