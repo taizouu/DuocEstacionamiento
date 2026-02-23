@@ -65,7 +65,7 @@ const Monitor = () => {
                alignItems: 'center', 
                padding: '230px', // Quitamos el padding para ganar espacio
                boxSizing: 'border-box',
-               transform: 'scale(1.4)', 
+               transform: 'scale(1.1)', 
                transformOrigin: 'center center' // Para que crezca desde el centro
            }}>
                <Mapa token={null} /> 
