@@ -84,10 +84,6 @@ class ProcesarPistoleoView(APIView):
                 if not lugar:
                     return Response({"error": f"El lugar {id_lugar} no existe"}, status=404)
 
-                # ==========================================================
-                # LÓGICA DE DECISIÓN CORREGIDA
-                # ==========================================================
-                
                 # CASO 1: VIENE UN RUT (INTENTO DE ENTRADA / ASIGNACIÓN)
                 if rut_raw:
                     # Si intentamos asignar (tenemos RUT) pero el lugar está ocupado -> ERROR
@@ -161,16 +157,20 @@ class LiberarLugarManualView(APIView):
 
     def post(self, request):
         es_autorizado = request.user.groups.filter(name__in=['Cetecom', 'Jefe de Seguridad']).exists()
+        
         if not (es_autorizado or request.user.is_superuser):
             return Response({"error": "⛔ No tienes permisos."}, status=403)
 
         lugar_id = request.data.get('id_lugar')
-        password = request.data.get('password') # Recibimos la clave
+        # En tu mapa.js envías 'pass' en vez de 'password' para esta función específica
+        # Así que verificamos ambas por si acaso
+        password = request.data.get('password') or request.data.get('pass') 
 
-        # VALIDACIÓN DE CLAVE MAESTRA (Usando el modelo de la otra app)
-        config, _ = ConfiguracionSistema.objects.get_or_create(id=1)
-        if password != config.clave_maestra:
-             return Response({"error": "⛔ Clave incorrecta"}, status=403)
+        if not password:
+            return Response({"error": "Debe ingresar su contraseña"}, status=400)
+            
+        if not request.user.check_password(password):
+             return Response({"error": "⛔ Contraseña de usuario incorrecta"}, status=403)
 
         if not lugar_id: return Response({"error": "Faltan datos"}, status=400)
         
@@ -235,10 +235,14 @@ class CambiarLugarVehiculoView(APIView):
         destino_id = request.data.get('lugar_destino')
         password_admin = request.data.get('password')
 
-        # VALIDACIÓN DE CLAVE MAESTRA
-        config, _ = ConfiguracionSistema.objects.get_or_create(id=1)
-        if password_admin != config.clave_maestra:
-            return Response({"error": "⛔ Contraseña administrativa incorrecta"}, status=403)
+        # =========================================================
+        # 🔐 NUEVA VALIDACIÓN: Contraseña del propio usuario
+        # =========================================================
+        if not password_admin:
+            return Response({"error": "Debe ingresar su contraseña"}, status=400)
+            
+        if not request.user.check_password(password_admin):
+            return Response({"error": "⛔ Contraseña de usuario incorrecta"}, status=403)
 
         if not origen_id or not destino_id:
             return Response({"error": "Faltan datos"}, status=400)
