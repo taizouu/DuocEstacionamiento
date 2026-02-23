@@ -251,7 +251,7 @@ return (
                         </div>
                     </div>
 
-                    {/* ZONA MEDIA (75-83 y Cuadro Info) */}
+{/* ZONA MEDIA (75-83 y Cuadro Info) */}
                     <div className="flex-row" style={{ alignItems: 'flex-start' }}>
                         <div className="flex-col">
                             {[83,82,81,80,79,78,77,76,75].map(n => <Celda key={n} id={String(n)} />)}
@@ -275,13 +275,16 @@ return (
                         </div>
 
                         {/* ZONA MEDIA-DERECHA (23-46) */}
-                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: '215px' }}>
+                        {/* AQUÍ REEMPLAZAMOS EL marginLeft: 215px POR calc(var(--cell-size) * 6.5) */}
+                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: 'calc(var(--cell-size) * 6.5)' }}>
                             <div className="flex-col">
                                 {[23,24,25,26,27,28,29,30,31,32].map(n => <Celda key={n} id={String(n)} />)}
-                                <div style={{ height: '32px' }}></div> 
+                                {/* AQUÍ REEMPLAZAMOS EL height: 32px POR calc(var(--cell-size) * 1) */}
+                                <div style={{ height: 'calc(var(--cell-size) * 1)' }}></div> 
                                 <div className="flex-row"><Celda id="45" /> <Celda id="44"/></div>
                             </div>
-                            <div style={{ width: '30px' }}></div>
+                            {/* AQUÍ REEMPLAZAMOS EL width: 30px POR calc(var(--cell-size) * 0.9) */}
+                            <div style={{ width: 'calc(var(--cell-size) * 0.9)' }}></div>
                             <div className="flex-col">
                                 {[33,34,35,36,37,38,39,40,41,42,43].map(n => <Celda key={n} id={String(n)} />)}
                             </div>
@@ -294,7 +297,8 @@ return (
                     </div>
 
                     {/* FILA INFERIOR (47-73) */}
-                    <div className="flex-row" style={{ marginTop: '40px' }}> 
+                    {/* AQUÍ REEMPLAZAMOS EL marginTop: 40px POR calc(var(--cell-size) * 1.2) */}
+                    <div className="flex-row" style={{ marginTop: 'calc(var(--cell-size) * 1.2)' }}> 
                         {[73,72,71,70,69,68,67].map(n => <Celda key={n} id={String(n)} />)}
                         <Celda id="66" w={3} />
                         {[65,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47].map(n => <Celda key={n} id={String(n)} />)}

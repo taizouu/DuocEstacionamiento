@@ -65,7 +65,7 @@ class ProcesarPistoleoView(APIView):
 
     def post(self, request):
         try:
-            rut_raw = request.data.get('rut')
+            rut_raw = request.data.get('rut') # El RUT que viene del paso 2
             id_lugar_raw = request.data.get('id_lugar')
             
             # Datos opcionales (Visitas)
@@ -84,44 +84,29 @@ class ProcesarPistoleoView(APIView):
                 if not lugar:
                     return Response({"error": f"El lugar {id_lugar} no existe"}, status=404)
 
-                # === ESCENARIO A: SALIDA ===
-                if lugar.esta_ocupado:
-                    funcionario = lugar.ocupado_por
-                    lugar.ocupado_por = None
-                    lugar.save()
-
-                    RegistroMovimiento.objects.filter(
-                        lugar=lugar,
-                        funcionario=funcionario,
-                        fecha_salida__isnull=True
-                    ).update(
-                        fecha_salida=timezone.now(),
-                        tipo_salida='NORMAL'
-                    )
-
-                    return Response({
-                        "mensaje": "Liberado correctamente",
-                        "tipo": "salida",
-                        "lugar": id_lugar,
-                        "funcionario": funcionario.nombre if funcionario else "Desconocido"
-                    })
-
-                # === ESCENARIO B: ENTRADA ===
-                else:
-                    if not rut_raw:
-                        return Response({"error": "Lugar libre. Falta RUT."}, status=400)
-
+                # ==========================================================
+                # LÓGICA DE DECISIÓN CORREGIDA
+                # ==========================================================
+                
+                # CASO 1: VIENE UN RUT (INTENTO DE ENTRADA / ASIGNACIÓN)
+                if rut_raw:
+                    # Si intentamos asignar (tenemos RUT) pero el lugar está ocupado -> ERROR
+                    if lugar.esta_ocupado:
+                        ocupante = lugar.ocupado_por.nombre if lugar.ocupado_por else "Alguien"
+                        return Response({
+                            "error": f"⛔ EL LUGAR {id_lugar} ESTÁ OCUPADO POR {ocupante}",
+                            "codigo": "LUGAR_OCUPADO"
+                        }, status=400)
+                    
+                    # Si el lugar está libre, procedemos con la ENTRADA normal
                     rut_limpio = formatear_rut(rut_raw)
                     funcionario = Funcionario.objects.filter(rut=rut_limpio).first()
 
                     if not funcionario:
                         if nombre_visita:
                             funcionario = Funcionario.objects.create(
-                                rut=rut_limpio,
-                                nombre=nombre_visita,
-                                cargo='Visita',
-                                ppu=patente_visita,
-                                destino=zona_visita
+                                rut=rut_limpio, nombre=nombre_visita, cargo='Visita',
+                                ppu=patente_visita, destino=zona_visita
                             )
                         else:
                             return Response({"error": "RUT no registrado", "codigo": "RUT_NO_ENCONTRADO"}, status=404)
@@ -136,19 +121,37 @@ class ProcesarPistoleoView(APIView):
 
                     lugar.ocupado_por = funcionario
                     lugar.save()
-
                     RegistroMovimiento.objects.create(funcionario=funcionario, lugar=lugar)
 
                     return Response({
                         "mensaje": f"Ingreso: {funcionario.nombre}",
                         "tipo": "entrada",
                         "datos": {
-                            "nombre": funcionario.nombre,
-                            "lugar": lugar.id_lugar,
-                            "patente": funcionario.ppu or "---",
-                            "hora": timezone.localtime(timezone.now()).strftime("%H:%M")
+                            "nombre": funcionario.nombre, "lugar": lugar.id_lugar,
+                            "patente": funcionario.ppu or "---", "hora": timezone.localtime(timezone.now()).strftime("%H:%M")
                         }
                     })
+
+                # CASO 2: NO VIENE RUT (INTENTO DE SALIDA / LIBERACIÓN RÁPIDA)
+                else:
+                    if lugar.esta_ocupado:
+                        funcionario = lugar.ocupado_por
+                        lugar.ocupado_por = None
+                        lugar.save()
+
+                        RegistroMovimiento.objects.filter(
+                            lugar=lugar, funcionario=funcionario, fecha_salida__isnull=True
+                        ).update(fecha_salida=timezone.now(), tipo_salida='NORMAL')
+
+                        return Response({
+                            "mensaje": "Liberado correctamente",
+                            "tipo": "salida",
+                            "lugar": id_lugar,
+                            "funcionario": funcionario.nombre if funcionario else "Desconocido"
+                        })
+                    else:
+                        # Si escaneamos un lugar vacío sin RUT -> Error
+                        return Response({"error": "Lugar libre. Para asignar, escanee un RUT primero."}, status=400)
 
         except Exception as e:
             return Response({"error": f"Error interno: {str(e)}"}, status=500)
