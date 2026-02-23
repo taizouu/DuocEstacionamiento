@@ -252,7 +252,7 @@ return (
                     </div>
 
                     {/* ZONA MEDIA (75-83 y Cuadro Info) */}
-                    <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: 'calc(var(--cell-size) * 6.7)' }}>
+                    <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: 'calc(var(--cell-size) * 2.7)' }}>
                         <div className="flex-col">
                             {[83,82,81,80,79,78,77,76,75].map(n => <Celda key={n} id={String(n)} />)}
                         </div>
@@ -275,7 +275,7 @@ return (
                         </div>
 
                         {/* ZONA MEDIA-DERECHA (23-46) */}
-                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: '215px' }}>
+                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: '120px' }}>
                             <div className="flex-col">
                                 {[23,24,25,26,27,28,29,30,31,32].map(n => <Celda key={n} id={String(n)} />)}
                                 <div style={{ height: 'calc(var(--cell-size) * 1)' }}></div>
