@@ -1,9 +1,7 @@
 :root {
-  /* Magia Responsiva:
-     El tamaño ideal de la celda es 2.2% del ancho de la pantalla (2.2vw).
-     Pero nunca bajará de 20px (para móviles/laptops chicas) ni pasará de 40px (pantallas gigantes).
-  */
-  --cell-size: clamp(20px, 2.2vw, 40px); 
+  /* CORRECCIÓN: El máximo absoluto es 32px (tu tamaño original). 
+     Bajamos a 1.5vw para que en un laptop (1366px de ancho) la celda baje automáticamente a ~20px. */
+  --cell-size: clamp(14px, 1.5vw, 32px); 
   
   --border-color: #ffffff;
   --bg-excel: #f0f2f5;
@@ -13,41 +11,43 @@
   --text-color: #000;
 }
 
-/* Modificamos el padding fijo por uno dinámico */
 .contenedor-principal {
-  padding: calc(var(--cell-size) * 1);
+  padding: 40px;
   background-color: white;
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Centra todo el mapa en la pantalla */
   overflow-x: auto;
 }
 
+/* --- LAYOUT MACRO --- */
+/* Esta es la clave: Dos grandes paneles lado a lado */
 .layout-macro {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  /* Cambiamos el gap de 40px a 1.2 veces el tamaño de una celda */
-  gap: calc(var(--cell-size) * 1.2); 
+  /* Tu gap original era 40px (40 / 32 = 1.25) */
+  gap: calc(var(--cell-size) * 1.25); 
 }
 
+/* Utilitarios de Flexbox */
 .flex-col { display: flex; flex-direction: column; }
 .flex-row { display: flex; flex-direction: row; }
 
+/* --- COMPONENTES --- */
 .celda {
   width: var(--cell-size);
   height: var(--cell-size);
   display: flex;
   align-items: center;
   justify-content: center;
-  /* La fuente también se achica con la celda */
-  font-size: calc(var(--cell-size) * 0.35); 
+  font-size: 10px;
   font-weight: bold;
   border: 1px solid var(--border-color);
   color: var(--text-color);
   cursor: pointer;
-  box-sizing: border-box;
+  box-sizing: border-box; /* Asegura que el borde no sume tamaño */
 }
 
 .libre { background-color: var(--color-libre); }
@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(var(--cell-size) * 0.4);
+  font-size: 11px;
   text-align: center;
 }
 
@@ -67,47 +67,43 @@
   transform: rotate(180deg);
 }
 
+/* Panel Central de Información */
 .panel-info {
   background-color: #e6eff6;
   border: 1px solid white;
   padding: calc(var(--cell-size) * 0.6);
-  /* Ancho amarrado a 11 celdas de ancho */
-  width: calc(var(--cell-size) * 11); 
-  /* Márgenes amarrados al tamaño de la celda */
-  margin: 0 calc(var(--cell-size) * 0.8); 
+  /* Tu panel original medía 380px (380 / 32 = 11.8) */
+  width: calc(var(--cell-size) * 11.8); 
+  /* Tus márgenes originales eran 30px (30 / 32 = 0.9) */
+  margin: 0 calc(var(--cell-size) * 0.9); 
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-
-.panel-info h3 { 
-    margin-top: 0; 
-    font-size: calc(var(--cell-size) * 0.45); 
-    text-decoration: underline; 
-    margin-bottom: calc(var(--cell-size) * 0.4);
-}
-.dato-fila { display: flex; margin-bottom: 8px; font-size: calc(var(--cell-size) * 0.4); }
-.dato-label { font-weight: bold; width: calc(var(--cell-size) * 2.5); }
+.panel-info h3 { margin-top: 0; font-size: 14px; text-decoration: underline; margin-bottom: 15px;}
+.dato-fila { display: flex; margin-bottom: 8px; font-size: 13px; }
+.dato-label { font-weight: bold; width: 70px; }
 .dato-valor { color: #2c5282; font-weight: bold; }
 
+/* Ajuste para las celdas dobles apiladas */
 .par-doble {
   display: flex;
   flex-direction: column;
 }
 
 .tooltip-flotante {
-  position: fixed; 
-  background-color: rgba(26, 32, 44, 0.95);
+  position: fixed; /* Se mueve libremente por la pantalla */
+  background-color: rgba(26, 32, 44, 0.95); /* Fondo oscuro elegante */
   color: white;
   padding: 12px 15px;
   border-radius: 8px;
   font-size: 13px;
-  pointer-events: none; 
-  z-index: 9999; 
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); 
+  pointer-events: none; /* CLAVE: El mouse ignora la caja para no parpadear */
+  z-index: 9999; /* Siempre encima de todo */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); /* Sombra suave */
   border: 1px solid rgba(255, 255, 255, 0.1);
   min-width: 150px;
-  backdrop-filter: blur(4px); 
+  backdrop-filter: blur(4px); /* Efecto de vidrio borroso */
 }
 
 .tooltip-header {
