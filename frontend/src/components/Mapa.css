@@ -1,13 +1,10 @@
 :root {
-  /* CORRECCIÓN: El máximo absoluto es 32px (tu tamaño original). 
-     Bajamos a 1.5vw para que en un laptop (1366px de ancho) la celda baje automáticamente a ~20px. */
-  --cell-size: clamp(14px, 1.5vw, 32px); 
-  
+  --cell-size: 32px; /* Ajustado un poco más pequeño para que quepa todo */
   --border-color: #ffffff;
   --bg-excel: #f0f2f5;
   --color-libre: #00ff00;
   --color-ocupado: #ff0000;
-  --color-azul: #cfe2f3; 
+  --color-azul: #cfe2f3; /* Azul Bodega exacto */
   --text-color: #000;
 }
 
@@ -26,9 +23,8 @@
 .layout-macro {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  /* Tu gap original era 40px (40 / 32 = 1.25) */
-  gap: calc(var(--cell-size) * 1.25); 
+  align-items: flex-start; /* Ambos empiezan desde arriba */
+  gap: 40px; /* El espacio blanco entre la columna 99 y la Caja Escala */
 }
 
 /* Utilitarios de Flexbox */
@@ -69,13 +65,11 @@
 
 /* Panel Central de Información */
 .panel-info {
-  background-color: #e6eff6;
+  background-color: #e6eff6; /* Azul grisáceo suave */
   border: 1px solid white;
-  padding: calc(var(--cell-size) * 0.6);
-  /* Tu panel original medía 380px (380 / 32 = 11.8) */
-  width: calc(var(--cell-size) * 11.8); 
-  /* Tus márgenes originales eran 30px (30 / 32 = 0.9) */
-  margin: 0 calc(var(--cell-size) * 0.9); 
+  padding: 20px;
+  width: 380px;
+  margin: 0 30px; /* Espacio a los lados */
   display: flex;
   flex-direction: column;
   justify-content: center;
