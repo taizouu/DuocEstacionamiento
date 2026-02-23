@@ -63,9 +63,9 @@ const Monitor = () => {
                display: 'flex', 
                justifyContent: 'center', 
                alignItems: 'center', 
-               padding: '80px', // Quitamos el padding para ganar espacio
+               padding: '230px', // Quitamos el padding para ganar espacio
                boxSizing: 'border-box',
-               transform: 'scale(1.1)', 
+               transform: 'scale(1.4)', 
                transformOrigin: 'center center' // Para que crezca desde el centro
            }}>
                <Mapa token={null} /> 
