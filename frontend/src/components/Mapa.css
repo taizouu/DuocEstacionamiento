@@ -117,7 +117,7 @@
   :root {
     /* Magia Negra: La celda medirá exactamente el 2% del ancho de la pantalla.
        Si el laptop es más chico, la celda se achica proporcionalmente al instante. */
-    --cell-size: 1vw; 
+    --cell-size: 1.8vw; 
   }
 }
 
