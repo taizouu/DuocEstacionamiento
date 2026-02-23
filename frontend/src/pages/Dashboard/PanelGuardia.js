@@ -107,7 +107,7 @@ const PanelGuardia = () => {
             setMensaje(null); 
         } else {
             setMensaje({ tipo: 'error', texto: "ERROR", detalle: errorData?.error || "Error de conexión" });
-            if (paso === 2) { setPaso(1); setRutTemporal(''); }
+            ///if (paso === 2) { setPaso(1); setRutTemporal(''); }
         }
       }
       setInputValue('');
