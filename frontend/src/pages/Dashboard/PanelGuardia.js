@@ -237,11 +237,11 @@ const PanelGuardia = () => {
       <div className="contenido-dinamico" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
          {vista === 'mapa' ? (
              
-             // --- NUEVA ESTRUCTURA DIVIDIDA PARA EL GUARDIA ---
-             <div style={{ display: 'flex', flex: 1, gap: '15px', padding: '0 20px 20px 20px' }}>
+             // --- NUEVA ESTRUCTURA DIVIDIDA RESPONSIVA PARA EL GUARDIA ---
+             <div className="contenedor-dividido" style={{ display: 'flex', flex: 1, gap: '15px', padding: '0 20px 20px 20px' }}>
                 
-                {/* 70% MAPA */}
-                <div style={{ flex: '0 0 72%', background: 'white', borderRadius: '8px', padding: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                {/* ZONA DEL MAPA */}
+                <div className="seccion-mapa" style={{ flex: '0 0 72%', background: 'white', borderRadius: '8px', padding: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                     <Mapa 
                         datosIngreso={datosMapa} 
                         recargar={triggerGeneral} 
@@ -249,15 +249,15 @@ const PanelGuardia = () => {
                     />
                 </div>
 
-                {/* 28% ÚLTIMOS REGISTROS (MINI TABLA) */}
-                <div style={{ flex: 1, background: 'white', borderRadius: '8px', padding: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+                {/* ZONA DE ÚLTIMOS REGISTROS (MINI TABLA) */}
+                <div className="seccion-tabla" style={{ flex: 1, background: 'white', borderRadius: '8px', padding: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
                     <h3 style={{ marginTop: 0, color: '#002D5C', borderBottom: '2px solid #FFB500', paddingBottom: '10px', fontSize: '1.1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>Últimos Movimientos</span>
                         <span style={{ fontSize: '0.8rem', background: '#e3f2fd', color: '#0d47a1', padding: '2px 6px', borderRadius: '10px' }}>En vivo</span>
                     </h3>
                     
                     <div style={{ flex: 1, overflowY: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '20px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                             <thead>
                                 <tr style={{ color: '#666', textAlign: 'center', borderBottom: '1px solid #eee' }}>
                                     <th style={{ padding: '8px 4px' }}>Hora</th>
@@ -272,7 +272,6 @@ const PanelGuardia = () => {
                                 ) : (
                                     ultimosRegistros.map(mov => (
                                         <tr key={mov.id} style={{ borderBottom: '1px solid #f8f9fa' }}>
-                                            {/* Hora de ingreso o salida dependiendo del estado */}
                                             <td style={{ padding: '10px 4px', fontWeight: 'bold', color: '#333' }}>
                                                 {mov.estado === 'Activo' ? extraerHora(mov.ingreso) : extraerHora(mov.salida)}
                                             </td>

@@ -20,6 +20,7 @@
 
 /* --- LAYOUT MACRO --- */
 /* Esta es la clave: Dos grandes paneles lado a lado */
+
 .layout-macro {
   display: flex;
   flex-direction: row;

@@ -46,7 +46,7 @@
 .barra-accion.info { 
     background-color: #17a2b8 !important; 
     color: white !important;
-}         
+}        
 
 /* --- ZONA DEL INPUT Y BOTÓN CANCELAR --- */
 .input-zona {
@@ -143,4 +143,30 @@
     height: 100%;
     overflow-y: auto;
     padding: 20px;
+}
+
+/* ==============================================================
+   📱 RESPONSIVIDAD NO DESTRUCTIVA (LAPTOPS Y TABLETS)
+   ============================================================== */
+
+@media screen and (max-width: 1100px) {
+    /* 1. Rompemos la fila y apilamos hacia abajo */
+    .contenedor-dividido {
+        flex-direction: column !important;
+        overflow-y: auto !important; /* Permite hacer scroll hacia abajo */
+    }
+    
+    /* 2. El mapa deja de estar apretado al 72% y toma todo el ancho */
+    .seccion-mapa {
+        flex: none !important;
+        width: 100% !important;
+        min-height: 550px !important; /* Altura segura para que el mapa se vea bien */
+    }
+
+    /* 3. La tabla baja y toma todo el ancho disponible */
+    .seccion-tabla {
+        flex: none !important;
+        width: 100% !important;
+        min-height: 350px !important; 
+    }
 }
