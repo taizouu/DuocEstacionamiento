@@ -146,27 +146,42 @@
 }
 
 /* ==============================================================
-   📱 RESPONSIVIDAD NO DESTRUCTIVA (LAPTOPS Y TABLETS)
+   RESPONSIVIDAD NO DESTRUCTIVA (LAPTOPS Y TABLETS)
    ============================================================== */
 
-@media screen and (max-width: 1100px) {
-    /* 1. Rompemos la fila y apilamos hacia abajo */
+/* Subimos el límite a 1440px para atrapar a todos los Laptops del mercado */
+@media screen and (max-width: 1440px) {
+    
+    /* 1. ROMPEMOS EL CANDADO DE ALTURA: Permitimos que la página tenga scroll hacia abajo */
+    .guardia-dashboard {
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+
+    .contenido-dinamico {
+        overflow: visible !important;
+    }
+
+    /* 2. Rompemos la fila (70/30) y apilamos hacia abajo (Mapa arriba, Tabla abajo) */
     .contenedor-dividido {
         flex-direction: column !important;
-        overflow-y: auto !important; /* Permite hacer scroll hacia abajo */
+        height: auto !important;
     }
     
-    /* 2. El mapa deja de estar apretado al 72% y toma todo el ancho */
+    /* 3. El mapa toma el 100% del ancho. 
+       Si el mapa sigue siendo muy grande, se le habilita una barra de scroll horizontal 
+       interna para no romper el resto del panel. */
     .seccion-mapa {
         flex: none !important;
         width: 100% !important;
-        min-height: 550px !important; /* Altura segura para que el mapa se vea bien */
+        min-height: 550px !important; 
+        overflow-x: auto !important; 
     }
 
-    /* 3. La tabla baja y toma todo el ancho disponible */
+    /* 4. La tabla se va abajo del todo, tomando el 100% del ancho para leerse perfecta */
     .seccion-tabla {
         flex: none !important;
         width: 100% !important;
-        min-height: 350px !important; 
+        min-height: 400px !important; 
     }
 }
