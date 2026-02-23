@@ -25,7 +25,6 @@ const cargarDatos = useCallback(async () => {
             const data = await mapaService.obtenerMapa();
             
             // A. Procesamos los lugares (Ahora vienen dentro de data.lugares)
-            // IMPORTANTE: Antes 'data' era el array, ahora es 'data.lugares'
             const listaLugares = data.lugares || []; 
             const dic = {};
             listaLugares.forEach(l => dic[l.id_lugar] = l);
@@ -33,7 +32,6 @@ const cargarDatos = useCallback(async () => {
 
             // B. Procesamos el último ingreso (Para que lo vean TODOS)
             if (data.ultimo_ingreso) {
-                // Solo actualizamos si no viene null
                 setUltimoIngreso(data.ultimo_ingreso);
             }
 
@@ -90,24 +88,17 @@ return (
                 }}
                 onMouseEnter={(e) => {
                     if (estaOcupado) {
-                        // Si está ocupado, abrimos el tooltip
                         setTooltip({ visible: true, x: e.clientX, y: e.clientY, id: id });
                     } else {
-                        // CORRECCIÓN CLAVE: 
-                        // Si entro a un lugar LIBRE, fuerzo el cierre inmediato del tooltip
-                        // para evitar que quede pegada la info del auto anterior.
                         setTooltip({ visible: false, x: 0, y: 0, id: null });
                     }
                 }}
                 onMouseMove={(e) => {
-                    // Solo actualizamos la posición si REALMENTE hay un tooltip visible Y es un lugar ocupado.
-                    // Esto evita arrastrar el tooltip fantasma por el mapa.
                     if (tooltip.visible && estaOcupado) {
                         setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
                     }
                 }}
                 onMouseLeave={() => {
-                    // Al salir, cerramos siempre por seguridad
                     setTooltip({ visible: false, x: 0, y: 0, id: null });
                 }}
                 onClick={() => estaOcupado && setModal({ abierto: true, lugarId: id, pass: "" })}
@@ -129,11 +120,8 @@ return (
 
     const getDatosOcupante = () => {
         if (!tooltip.visible || !tooltip.id) return null;
-        
-        // Búsqueda robusta del lugar
         const id = tooltip.id;
         const info = lugares[id] || lugares[`E.${id}`];
-        
         return info ? info.ocupado_por : null;
     };
 
@@ -142,24 +130,13 @@ return (
     return (
         <div className="contenedor-principal" style={{ position: 'relative' }}>
             
-            {/* === POP-UP / TOOLTIP MEJORADO === */}
+            {/* === POP-UP / TOOLTIP === */}
             {tooltip.visible && datosOcupante && (
                 <div 
                     className="tooltip-flotante" 
                     style={{ 
                         top: tooltip.y + 15, 
                         left: tooltip.x + 15, 
-                        position: 'fixed', 
-                        zIndex: 3000, 
-                        pointerEvents: 'none', // Importante para que no parpadee al mover el mouse
-                        background: 'rgba(0, 45, 92, 0.95)', // Azul Duoc oscuro semi-transparente
-                        color: 'white',
-                        padding: '12px',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-                        minWidth: '180px',
-                        fontSize: '13px',
-                        backdropFilter: 'blur(4px)'
                     }}
                 >
                     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.3)', paddingBottom: '5px', marginBottom: '5px', fontWeight: 'bold', textTransform: 'uppercase', color: '#FFB500' }}>
@@ -230,9 +207,12 @@ return (
 
                 {/* 2. SECTOR CENTRAL Y DERECHO */}
                 <div className="flex-col">
+                    
                     {/* FILA SUPERIOR (1 al 22) */}
-                    <div className="flex-row" style={{ alignItems: 'flex-end', marginBottom: '25px' }}>
-                        <div style={{ marginRight: '20px' }}><ZonaAzul texto="Caja Escala" w={2} h={2} /></div>
+                    {/* REFACTOR: Cambiamos 25px por calc(var(--cell-size) * 0.8) */}
+                    <div className="flex-row" style={{ alignItems: 'flex-end', marginBottom: 'calc(var(--cell-size) * 0.8)' }}>
+                        {/* REFACTOR: Cambiamos 20px por calc(var(--cell-size) * 0.6) */}
+                        <div style={{ marginRight: 'calc(var(--cell-size) * 0.6)' }}><ZonaAzul texto="Caja Escala" w={2} h={2} /></div>
                         <div className="flex-col">
                             <ZonaAzul texto="Bodegas" w={8} h={1} />
                             <div className="flex-row">
@@ -246,7 +226,8 @@ return (
                             <ParDoble n={16} />
                         </div>
                         <ZonaAzul texto="Gr.Elec" w={0.8} h={2} vertical={true} />
-                        <div className="flex-row" style={{ marginLeft: '5px' }}>
+                        {/* REFACTOR: Cambiamos 5px por calc(var(--cell-size) * 0.15) */}
+                        <div className="flex-row" style={{ marginLeft: 'calc(var(--cell-size) * 0.15)' }}>
                             {[17,18,19,20,21,22].map(n => <ParDoble key={n} n={n} />)}
                         </div>
                     </div>
@@ -275,13 +256,16 @@ return (
                         </div>
 
                         {/* ZONA MEDIA-DERECHA (23-46) */}
-                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: '215px' }}>
+                        {/* REFACTOR: Cambiamos 215px por calc(var(--cell-size) * 6.7) */}
+                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: 'calc(var(--cell-size) * 6.7)' }}>
                             <div className="flex-col">
                                 {[23,24,25,26,27,28,29,30,31,32].map(n => <Celda key={n} id={String(n)} />)}
-                                <div style={{ height: '32px' }}></div> 
+                                {/* REFACTOR: Cambiamos 32px por var(--cell-size) */}
+                                <div style={{ height: 'var(--cell-size)' }}></div> 
                                 <div className="flex-row"><Celda id="45" /> <Celda id="44"/></div>
                             </div>
-                            <div style={{ width: '30px' }}></div>
+                            {/* REFACTOR: Cambiamos 30px por calc(var(--cell-size) * 0.9) */}
+                            <div style={{ width: 'calc(var(--cell-size) * 0.9)' }}></div>
                             <div className="flex-col">
                                 {[33,34,35,36,37,38,39,40,41,42,43].map(n => <Celda key={n} id={String(n)} />)}
                             </div>
@@ -294,7 +278,8 @@ return (
                     </div>
 
                     {/* FILA INFERIOR (47-73) */}
-                    <div className="flex-row" style={{ marginTop: '40px' }}> 
+                    {/* REFACTOR: Cambiamos 40px por calc(var(--cell-size) * 1.25) */}
+                    <div className="flex-row" style={{ marginTop: 'calc(var(--cell-size) * 1.25)' }}> 
                         {[73,72,71,70,69,68,67].map(n => <Celda key={n} id={String(n)} />)}
                         <Celda id="66" w={3} />
                         {[65,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47].map(n => <Celda key={n} id={String(n)} />)}
