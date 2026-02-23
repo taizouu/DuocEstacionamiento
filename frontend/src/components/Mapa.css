@@ -1,9 +1,11 @@
 /* ==============================================================
-   MAPA.CSS - ARQUITECTURA RESPONSIVA MULTIPLATAFORMA
+   MAPA.CSS - ESCALADO MATEMÁTICO PERFECTO (SIN ZOOM)
    ============================================================== */
 
 :root {
-  --cell-size: 32px; /* Tamaño nativo perfecto de ingeniería */
+  /* Tamaño base original para tu monitor (Pantallas grandes) */
+  --cell-size: 32px; 
+  
   --border-color: #ffffff;
   --bg-excel: #f0f2f5;
   --color-libre: #00ff00;
@@ -12,42 +14,40 @@
   --text-color: #000;
 }
 
-/* 1. EL CONTENEDOR (LA VENTANA DE VISIÓN) */
+/* 1. EL CONTENEDOR */
 .contenedor-principal {
   width: 100%;
   height: 100%;
-  min-height: 500px;
   background-color: white;
-  padding: 20px;
+  padding: 10px;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
   
-  /* Comportamiento base: centrado absoluto */
   display: flex;
   justify-content: center;
   align-items: flex-start;
   
-  /* Salvavidas nativo para celulares (Touch Scrolling) */
   overflow: auto; 
   -webkit-overflow-scrolling: touch; 
 }
 
-/* 2. EL PLANO (EL CANVAS RÍGIDO) */
+/* 2. EL PLANO (CANVAS FLUIDO) */
 .layout-macro {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 40px;
+  /* El gap ahora depende de la celda, no son 40px fijos */
+  gap: calc(var(--cell-size) * 1.25); 
   
-  /* LA RESINA EPÓXICA: Le decimos al mapa "Bajo ninguna circunstancia 
-     rompas tu estructura interna. Tu ancho mínimo vital es 1050px". */
-  min-width: 1050px; 
-  
-  /* Transición fluida cuando se redimensiona la ventana */
-  transition: zoom 0.3s ease;
+  /* IMPORTANTE: Eliminamos el min-width en píxeles. 
+     El ancho lo dicta matemáticamente el contenido */
+  width: max-content; 
+  margin: 0 auto; 
+  padding-bottom: 20px;
+  transition: all 0.3s ease;
 }
 
-/* --- CLASES INTERNAS (Tus estilos originales intactos) --- */
+/* --- CLASES INTERNAS --- */
 .flex-col { display: flex; flex-direction: column; }
 .flex-row { display: flex; flex-direction: row; }
 
@@ -57,7 +57,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  /* La letra se achica junto con la celda */
+  font-size: calc(var(--cell-size) * 0.35);
   font-weight: bold;
   border: 1px solid var(--border-color);
   color: var(--text-color);
@@ -73,7 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: calc(var(--cell-size) * 0.35);
   text-align: center;
 }
 
@@ -82,16 +83,17 @@
 .panel-info {
   background-color: #e6eff6;
   border: 1px solid white;
-  padding: 20px;
-  width: 380px;
-  margin: 0 30px; 
+  /* Atamos el panel a la matemática de la celda (Original era 380px y 30px) */
+  padding: calc(var(--cell-size) * 0.6);
+  width: calc(var(--cell-size) * 11.8);
+  margin: 0 calc(var(--cell-size) * 0.9); 
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.panel-info h3 { margin-top: 0; font-size: 14px; text-decoration: underline; margin-bottom: 15px;}
-.dato-fila { display: flex; margin-bottom: 8px; font-size: 13px; }
-.dato-label { font-weight: bold; width: 70px; }
+.panel-info h3 { margin-top: 0; font-size: calc(var(--cell-size) * 0.45); text-decoration: underline; margin-bottom: 10px;}
+.dato-fila { display: flex; margin-bottom: 8px; font-size: calc(var(--cell-size) * 0.4); }
+.dato-label { font-weight: bold; width: calc(var(--cell-size) * 2.2); }
 .dato-valor { color: #2c5282; font-weight: bold; }
 
 .par-doble { display: flex; flex-direction: column; }
@@ -111,45 +113,34 @@
   backdrop-filter: blur(4px); 
 }
 
-
 /* ==============================================================
-   🖥️ MEDIA QUERIES NIVEL ARQUITECTURA (TV, LAPTOP, MÓVIL)
+   🖥️ EL CEREBRO RESPONSIVO (Cambio de ADN por Pantalla)
    ============================================================== */
 
-/* 1. Monitores Grandes y TVs (Más de 1600px) */
-@media screen and (min-width: 1600px) {
-  .layout-macro {
-    zoom: 1.15; /* Lo agrandamos un 15% para aprovechar la pantalla gigante */
+/* 1. Laptops Estándar (menor a 1500px) */
+@media screen and (max-width: 1500px) {
+  :root {
+    /* Achica todo el mapa un 20% automáticamente */
+    --cell-size: 25px; 
   }
 }
 
-/* 2. Laptops Estándar (1200px a 1440px) */
-@media screen and (max-width: 1440px) {
-  .layout-macro {
-    zoom: 0.85; /* Lo achicamos al 85% para que encaje perfecto sin desarmarse */
+/* 2. Laptops Pequeños y Tablets horizontales (menor a 1250px) */
+@media screen and (max-width: 1250px) {
+  :root {
+    /* Achica el mapa un 35% para que encaje perfecto sin desarmarse */
+    --cell-size: 21px; 
   }
 }
 
-/* 3. Laptops Pequeños y Tablets en horizontal (992px a 1199px) */
-@media screen and (max-width: 1199px) {
-  .layout-macro {
-    zoom: 0.70; /* Lo achicamos al 70% */
-  }
-}
-
-/* 4. Celulares y Tablets en vertical (Menos de 992px) */
+/* 3. Tablets verticales y Celulares (menor a 991px) */
 @media screen and (max-width: 991px) {
-  .contenedor-principal {
-    /* CRÍTICO UX: En celulares NUNCA se centra un mapa grande, o el lado izquierdo queda 
-       oculto e inaccesible. Se ancla a la izquierda para permitir el deslizamiento (Pan & Scan) */
-    justify-content: flex-start;
-    padding: 10px;
+  :root {
+    /* Vuelve a un tamaño decente para que el dedo pueda presionar las celdas */
+    --cell-size: 28px; 
   }
-
-  .layout-macro {
-    /* UX Móvil: Detenemos la reducción de tamaño. Si lo achicamos más, los dedos del guardia 
-       no podrán presionar los botones. Activamos el tamaño táctil mínimo y dejamos que el 
-       guardia se desplace por el estacionamiento arrastrando la pantalla. */
-    zoom: 0.75; 
+  .contenedor-principal {
+    /* Anclado a la izquierda para permitir scroll táctil horizontal */
+    justify-content: flex-start;
   }
 }
