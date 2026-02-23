@@ -8,36 +8,24 @@
   --text-color: #000;
 }
 
-/* --- CONTENEDOR DEL MAPA --- */
 .contenedor-principal {
-  /* Redujimos el padding para no perder espacio valioso en celulares */
-  padding: 15px; 
+  padding: 40px;
   background-color: white;
-  
-  /* Quitamos el min-height: 100vh para que no genere un espacio blanco gigante abajo */
-  min-height: auto; 
+  min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
-  
   display: flex;
-  /* CAMBIO CLAVE: Cambiamos 'center' por 'flex-start' para que el scroll en celular no corte el lado izquierdo */
-  justify-content: flex-start; 
-  align-items: flex-start;
-  
-  /* Habilita el desplazamiento con el dedo en celulares */
-  overflow: auto; 
-  width: 100%;
+  justify-content: center; /* Centra todo el mapa en la pantalla */
+  overflow-x: auto;
 }
 
 /* --- LAYOUT MACRO --- */
+/* Esta es la clave: Dos grandes paneles lado a lado */
+
 .layout-macro {
   display: flex;
   flex-direction: row;
-  align-items: flex-start; 
-  gap: 40px; 
-  
-  /* CAMBIO CLAVE: Obliga al mapa a mantener su forma original para que el contenedor lo deje hacer scroll horizontal */
-  min-width: max-content; 
-  padding-bottom: 20px; /* Espacio extra abajo para que no choque */
+  align-items: flex-start; /* Ambos empiezan desde arriba */
+  gap: 40px; /* El espacio blanco entre la columna 99 y la Caja Escala */
 }
 
 /* Utilitarios de Flexbox */
