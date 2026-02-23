@@ -1,50 +1,56 @@
+/* ==============================================================
+   MAPA.CSS - ARQUITECTURA RESPONSIVA MULTIPLATAFORMA
+   ============================================================== */
+
 :root {
-  --cell-size: 32px; /* Ajustado un poco más pequeño para que quepa todo */
+  --cell-size: 32px; /* Tamaño nativo perfecto de ingeniería */
   --border-color: #ffffff;
   --bg-excel: #f0f2f5;
   --color-libre: #00ff00;
   --color-ocupado: #ff0000;
-  --color-azul: #cfe2f3; /* Azul Bodega exacto */
+  --color-azul: #cfe2f3;
   --text-color: #000;
 }
 
-/* --- CONTENEDOR DEL MAPA --- */
+/* 1. EL CONTENEDOR (LA VENTANA DE VISIÓN) */
 .contenedor-principal {
-  /* Redujimos el padding para no perder espacio valioso en celulares */
-  padding: 15px; 
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
   background-color: white;
-  
-  /* Quitamos el min-height: 100vh para que no genere un espacio blanco gigante abajo */
-  min-height: auto; 
+  padding: 20px;
+  box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
   
+  /* Comportamiento base: centrado absoluto */
   display: flex;
-  /* CAMBIO CLAVE: Cambiamos 'center' por 'flex-start' para que el scroll en celular no corte el lado izquierdo */
-  justify-content: flex-start; 
+  justify-content: center;
   align-items: flex-start;
   
-  /* Habilita el desplazamiento con el dedo en celulares */
+  /* Salvavidas nativo para celulares (Touch Scrolling) */
   overflow: auto; 
-  width: 100%;
+  -webkit-overflow-scrolling: touch; 
 }
 
-/* --- LAYOUT MACRO --- */
+/* 2. EL PLANO (EL CANVAS RÍGIDO) */
 .layout-macro {
   display: flex;
   flex-direction: row;
-  align-items: flex-start; 
-  gap: 40px; 
+  align-items: flex-start;
+  gap: 40px;
   
-  /* CAMBIO CLAVE: Obliga al mapa a mantener su forma original para que el contenedor lo deje hacer scroll horizontal */
-  min-width: max-content; 
-  padding-bottom: 20px; /* Espacio extra abajo para que no choque */
+  /* LA RESINA EPÓXICA: Le decimos al mapa "Bajo ninguna circunstancia 
+     rompas tu estructura interna. Tu ancho mínimo vital es 1050px". */
+  min-width: 1050px; 
+  
+  /* Transición fluida cuando se redimensiona la ventana */
+  transition: zoom 0.3s ease;
 }
 
-/* Utilitarios de Flexbox */
+/* --- CLASES INTERNAS (Tus estilos originales intactos) --- */
 .flex-col { display: flex; flex-direction: column; }
 .flex-row { display: flex; flex-direction: row; }
 
-/* --- COMPONENTES --- */
 .celda {
   width: var(--cell-size);
   height: var(--cell-size);
@@ -56,7 +62,7 @@
   border: 1px solid var(--border-color);
   color: var(--text-color);
   cursor: pointer;
-  box-sizing: border-box; /* Asegura que el borde no sume tamaño */
+  box-sizing: border-box;
 }
 
 .libre { background-color: var(--color-libre); }
@@ -71,18 +77,14 @@
   text-align: center;
 }
 
-.texto-vertical {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
+.texto-vertical { writing-mode: vertical-rl; transform: rotate(180deg); }
 
-/* Panel Central de Información */
 .panel-info {
-  background-color: #e6eff6; /* Azul grisáceo suave */
+  background-color: #e6eff6;
   border: 1px solid white;
   padding: 20px;
   width: 380px;
-  margin: 0 30px; /* Espacio a los lados */
+  margin: 0 30px; 
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -92,42 +94,62 @@
 .dato-label { font-weight: bold; width: 70px; }
 .dato-valor { color: #2c5282; font-weight: bold; }
 
-/* Ajuste para las celdas dobles apiladas */
-.par-doble {
-  display: flex;
-  flex-direction: column;
-}
+.par-doble { display: flex; flex-direction: column; }
 
 .tooltip-flotante {
-  position: fixed; /* Se mueve libremente por la pantalla */
-  background-color: rgba(26, 32, 44, 0.95); /* Fondo oscuro elegante */
+  position: fixed; 
+  background-color: rgba(26, 32, 44, 0.95); 
   color: white;
   padding: 12px 15px;
   border-radius: 8px;
   font-size: 13px;
-  pointer-events: none; /* CLAVE: El mouse ignora la caja para no parpadear */
-  z-index: 9999; /* Siempre encima de todo */
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); /* Sombra suave */
+  pointer-events: none; 
+  z-index: 9999; 
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); 
   border: 1px solid rgba(255, 255, 255, 0.1);
   min-width: 150px;
-  backdrop-filter: blur(4px); /* Efecto de vidrio borroso */
+  backdrop-filter: blur(4px); 
 }
 
-.tooltip-header {
-  border-bottom: 1px solid #4a5568;
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #63b3ed; /* Azul claro para el título */
-  font-size: 11px;
-  text-transform: uppercase;
+
+/* ==============================================================
+   🖥️ MEDIA QUERIES NIVEL ARQUITECTURA (TV, LAPTOP, MÓVIL)
+   ============================================================== */
+
+/* 1. Monitores Grandes y TVs (Más de 1600px) */
+@media screen and (min-width: 1600px) {
+  .layout-macro {
+    zoom: 1.15; /* Lo agrandamos un 15% para aprovechar la pantalla gigante */
+  }
 }
 
-.tooltip-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 3px;
+/* 2. Laptops Estándar (1200px a 1440px) */
+@media screen and (max-width: 1440px) {
+  .layout-macro {
+    zoom: 0.85; /* Lo achicamos al 85% para que encaje perfecto sin desarmarse */
+  }
 }
 
-.tooltip-label { color: #a0aec0; font-size: 11px; margin-right: 10px;}
-.tooltip-value { font-weight: bold; text-align: right;}
+/* 3. Laptops Pequeños y Tablets en horizontal (992px a 1199px) */
+@media screen and (max-width: 1199px) {
+  .layout-macro {
+    zoom: 0.70; /* Lo achicamos al 70% */
+  }
+}
+
+/* 4. Celulares y Tablets en vertical (Menos de 992px) */
+@media screen and (max-width: 991px) {
+  .contenedor-principal {
+    /* CRÍTICO UX: En celulares NUNCA se centra un mapa grande, o el lado izquierdo queda 
+       oculto e inaccesible. Se ancla a la izquierda para permitir el deslizamiento (Pan & Scan) */
+    justify-content: flex-start;
+    padding: 10px;
+  }
+
+  .layout-macro {
+    /* UX Móvil: Detenemos la reducción de tamaño. Si lo achicamos más, los dedos del guardia 
+       no podrán presionar los botones. Activamos el tamaño táctil mínimo y dejamos que el 
+       guardia se desplace por el estacionamiento arrastrando la pantalla. */
+    zoom: 0.75; 
+  }
+}
