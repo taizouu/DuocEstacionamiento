@@ -152,9 +152,10 @@ STATIC_URL = 'static/'
 ###STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CORS_ALLOWED_ORIGINS = [
-    "http://192.168.3.144",
-    "http://192.168.3.144:3000", # Si tu frontend corre en el puerto 3000
     "http://localhost:3000",
+    "http://127.0.0.1",
+    #"http://192.168.3.144",
+    #"http://192.168.3.144:3000", # Si tu frontend corre en el puerto 3000
 ]
 
 # Opción 2 (Rápida para probar): Permitir TODO (Cambiar a Opción 1 cuando salgas a producción real)

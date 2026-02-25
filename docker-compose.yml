@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 1. BASE DE DATOS (PostgreSQL)
+  # ==========================================
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: EstacDuoc  # Revisa que coincida con tu .env
+      POSTGRES_USER: postgres      # Revisa que coincida con tu .env
+      POSTGRES_PASSWORD: Heavensdoa1502! # Revisa que coincida con tu .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ==========================================
+  # 2. CEREBRO (Tu Proyecto Django - Raíz)
+  # ==========================================
+  backend:
+    build: .  # El punto significa: "Construye usando el Dockerfile de ESTA misma carpeta"
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env  # Lee el .env que está en esta misma raíz
+
+  # ==========================================
+  # 3. INTERFAZ (Tu Panel de React)
+  # ==========================================
+  frontend:
+    build: ./frontend  # Entra a la carpeta frontend y usa su Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
