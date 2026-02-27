@@ -9,6 +9,10 @@ from .models import Lugar, RegistroMovimiento
 from funcionarios.models import Funcionario
 from administracion.models import ConfiguracionSistema 
 from .serializers import (LugarSerializer, MyTokenObtainPairSerializer, HistorialSerializer)
+import openpyxl
+from io import BytesIO
+from django.http import HttpResponse
+from datetime import datetime
 
 def formatear_rut(rut_raw):
     if not rut_raw: return None
@@ -236,7 +240,7 @@ class CambiarLugarVehiculoView(APIView):
         password_admin = request.data.get('password')
 
         # =========================================================
-        # 🔐 NUEVA VALIDACIÓN: Contraseña del propio usuario
+        # 🔐VALIDACIÓN: Contraseña del propio usuario
         # =========================================================
         if not password_admin:
             return Response({"error": "Debe ingresar su contraseña"}, status=400)
@@ -287,3 +291,73 @@ class CambiarLugarVehiculoView(APIView):
             return Response({"error": "Uno de los lugares especificados no existe"}, status=404)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+        
+class ExportarHistorialExcelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # 1. Capturamos los parámetros de filtro que vengan de React
+        fecha_inicio = request.GET.get('fecha_inicio')
+        fecha_fin = request.GET.get('fecha_fin')
+        nombre = request.GET.get('nombre')
+        patente = request.GET.get('patente')
+
+        # 2. Traemos todos los registros base
+        registros = RegistroMovimiento.objects.select_related('funcionario', 'lugar', 'liberado_por').all().order_by('-fecha_ingreso')
+
+        # 3. Aplicamos los filtros dinámicamente si es que existen
+        if nombre:
+            registros = registros.filter(funcionario__nombre__icontains=nombre)
+        if patente:
+            registros = registros.filter(funcionario__ppu__icontains=patente)
+        if fecha_inicio:
+            registros = registros.filter(fecha_ingreso__date__gte=fecha_inicio)
+        if fecha_fin:
+            registros = registros.filter(fecha_ingreso__date__lte=fecha_fin)
+
+        # 4. Creamos el archivo Excel en Memoria
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Historial Accesos"
+
+        # Dibujamos las cabeceras (Fila 1) - Cambiamos 'LIBERADO POR' a 'MÉTODO DE SALIDA'
+        headers = ['FECHA INGRESO', 'FECHA SALIDA', 'LUGAR', 'NOMBRE', 'RUT', 'CARGO', 'PATENTE', 'DESTINO', 'ESTADO', 'MÉTODO DE SALIDA']
+        ws.append(headers)
+
+        for r in registros:
+            ingreso = timezone.localtime(r.fecha_ingreso).strftime("%d/%m/%Y %H:%M") if r.fecha_ingreso else ""
+            salida = timezone.localtime(r.fecha_salida).strftime("%d/%m/%Y %H:%M") if r.fecha_salida else "En curso"
+            estado = "Activo" if r.es_activo else "Finalizado"
+            
+            # --- NUEVA LÓGICA DE LIBERACIÓN ---
+            metodo_salida = "---" # Por defecto para los que están 'Activos'
+            
+            if not r.es_activo:
+                if r.tipo_salida == 'AUTOMATICA':
+                    metodo_salida = "Automático (Nocturno)"
+                elif r.tipo_salida == 'MANUAL' or r.liberado_por:
+                    admin = r.liberado_por.username if r.liberado_por else "Admin"
+                    metodo_salida = f"Manual ({admin})"
+                else:
+                    # Si no es automático ni manual, asumimos que es el flujo normal
+                    metodo_salida = "Sistema (Escáner)"
+
+            ws.append([
+                ingreso, salida, r.lugar.id_lugar, r.funcionario.nombre, 
+                r.funcionario.rut, r.funcionario.cargo, r.funcionario.ppu or "---", 
+                r.funcionario.destino or "---", estado, metodo_salida
+            ])
+
+        buffer = BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        nombre_archivo = f'Reporte_Estacionamiento_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
+        response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+        
+        return response
+    

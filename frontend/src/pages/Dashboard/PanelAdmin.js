@@ -10,16 +10,15 @@ import Historial from '../../components/Historial';
 import './PanelGuardia.css'; 
 
 const PanelAdmin = ({ rolUsuario }) => { 
-  // Nota: Ya no necesitamos recibir 'token' como prop, api.js lo saca del localStorage
 
-  // ==========================================
-  // 1. ESTADOS GENERALES
-  // ==========================================
   const [vista, setVista] = useState('mapa'); 
   const [usuarios, setUsuarios] = useState([]);
-  
   // ==========================================
-  // 2. ESTADOS DEL ESCÁNER
+  const [filtroNombre, setFiltroNombre] = useState('');
+  const [filtroPatente, setFiltroPatente] = useState('');
+  const [filtroInicio, setFiltroInicio] = useState('');
+  const [filtroFin, setFiltroFin] = useState('');
+  const [descargandoExcel, setDescargandoExcel] = useState(false);
   // ==========================================
   const [mensaje, setMensaje] = useState(null); 
   const [triggerGeneral, setTriggerGeneral] = useState(0); 
@@ -162,6 +161,42 @@ const PanelAdmin = ({ rolUsuario }) => {
       if (!modalVisita && !datosVisita) setTimeout(() => inputRef.current?.focus(), 100);
   };
 
+  // --- C. EXPORTAR EXCEL ---
+  const handleDescargarExcel = async () => {
+      setDescargandoExcel(true);
+      try {
+          // Armamos los parámetros de búsqueda dinámicos
+          const params = new URLSearchParams();
+          if (filtroNombre) params.append('nombre', filtroNombre);
+          if (filtroPatente) params.append('patente', filtroPatente);
+          if (filtroInicio) params.append('fecha_inicio', filtroInicio);
+          if (filtroFin) params.append('fecha_fin', filtroFin);
+
+          // Petición al backend indicando que esperamos un BLOB (Archivo binario)
+          const response = await api.get(`/api/historial/exportar/?${params.toString()}`, {
+              responseType: 'blob', 
+          });
+
+          // Truco de navegador: Creamos una URL temporal invisible y forzamos el click
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          // Asignamos un nombre por defecto al descargar
+          link.setAttribute('download', `Reporte_Estacionamientos_${new Date().toISOString().split('T')[0]}.xlsx`);
+          document.body.appendChild(link);
+          link.click();
+          
+          // Limpiamos la memoria
+          link.parentNode.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          
+      } catch (error) {
+          alert("Error al descargar el archivo Excel.");
+          console.error(error);
+      }
+      setDescargandoExcel(false);
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       if (!inputValue) return;
@@ -258,9 +293,47 @@ const PanelAdmin = ({ rolUsuario }) => {
            </>
         )}
 
-        {/* VISTA 2: HISTORIAL */}
+        {/* VISTA 2: HISTORIAL Y REPORTE EXCEL */}
         {vista === 'historial' && (
-           <Historial token={null} /> 
+           <div style={{ padding: '0 20px 20px 20px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+               
+               {/* PANEL DE EXPORTACIÓN */}
+               <div style={{ ...cardStyle, marginBottom: '20px', display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'flex-end', background: '#e6eff6', border: '1px solid #cce5ff' }}>
+                   
+                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                       <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#002D5C' }}>Fecha Inicio:</label>
+                       <input type="date" value={filtroInicio} onChange={e => setFiltroInicio(e.target.value)} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                   </div>
+                   
+                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                       <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#002D5C' }}>Fecha Fin:</label>
+                       <input type="date" value={filtroFin} onChange={e => setFiltroFin(e.target.value)} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                   </div>
+
+                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                       <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#002D5C' }}>Filtrar Nombre:</label>
+                       <input type="text" placeholder="Ej: Juan" value={filtroNombre} onChange={e => setFiltroNombre(e.target.value)} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                   </div>
+
+                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                       <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#002D5C' }}>Filtrar Patente:</label>
+                       <input type="text" placeholder="Ej: AB12" value={filtroPatente} onChange={e => setFiltroPatente(e.target.value.toUpperCase())} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                   </div>
+
+                   <button 
+                       onClick={handleDescargarExcel} 
+                       disabled={descargandoExcel}
+                       style={{ background: '#28a745', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', fontWeight: 'bold', cursor: descargandoExcel ? 'wait' : 'pointer', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
+                   >
+                       {descargandoExcel ? '⏳ GENERANDO...' : '📊 DESCARGAR EXCEL'}
+                   </button>
+               </div>
+
+               {/* TABLA DE HISTORIAL ORIGINAL */}
+               <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <Historial token={null} /> 
+               </div>
+           </div>
         )}
 
         {/* VISTA 3: GESTIÓN DE USUARIOS */}

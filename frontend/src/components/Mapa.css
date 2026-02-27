@@ -1,10 +1,10 @@
 /* ==============================================================
-   MAPA.CSS - ESCALADO FLUIDO (VIEWPORT WIDTH)
+   MAPA.CSS - ESTRUCTURA RÍGIDA (Escalado por JS)
    ============================================================== */
 
 :root {
-  /* En pantallas muy grandes, la celda medirá 32px como máximo */
-  --cell-size: 32px; 
+  /* Tamaño fijo base. No lo cambiaremos con media queries. */
+  --cell-size: 35px; 
   
   --border-color: #ffffff;
   --bg-excel: #f0f2f5;
@@ -14,39 +14,30 @@
   --text-color: #000;
 }
 
-/* 1. EL CONTENEDOR PRINCIPAL */
 .contenedor-principal {
-  width: 100%;
-  height: 100%;
-  background-color: white;
+  /* Quitamos width/height 100% para que el contenedor abrace al mapa real */
+  background-color: transparent;
   padding: 10px;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
-  
-  /* Permite el scroll nativo si la pantalla es más pequeña que el mapa (ej. Celulares) */
   display: flex;
-  justify-content: flex-start; /* Clave: Nunca uses 'center' si esperas hacer scroll */
-  align-items: flex-start;
-  
-  overflow: auto; 
-  -webkit-overflow-scrolling: touch; 
+  justify-content: center; 
+  align-items: center;
 }
 
-/* 2. EL PLANO DEL MAPA */
 .layout-macro {
   display: flex;
-  flex-direction: row;
+  flex-direction: row; /* Forzamos a que sea fila siempre */
+  flex-wrap: nowrap;   /* PROHIBIDO QUE SE DESORDENE/APILE */
   align-items: flex-start;
   gap: calc(var(--cell-size) * 1.25); 
-  
-  /* Mantenemos un margen central para pantallas muy grandes */
   margin: 0 auto; 
   padding-bottom: 20px;
 }
 
 /* --- CLASES INTERNAS --- */
-.flex-col { display: flex; flex-direction: column; }
-.flex-row { display: flex; flex-direction: row; }
+.flex-col { display: flex; flex-direction: column; flex-wrap: nowrap; }
+.flex-row { display: flex; flex-direction: row; flex-wrap: nowrap; }
 
 .celda {
   width: var(--cell-size);
@@ -60,6 +51,7 @@
   color: var(--text-color);
   cursor: pointer;
   box-sizing: border-box;
+  flex-shrink: 0; /* Prohibido encogerse deformando el cuadro */
 }
 
 .libre { background-color: var(--color-libre); }
@@ -72,6 +64,7 @@
   justify-content: center;
   font-size: calc(var(--cell-size) * 0.35);
   text-align: center;
+  flex-shrink: 0;
 }
 
 .texto-vertical { writing-mode: vertical-rl; transform: rotate(180deg); }
@@ -85,6 +78,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex-shrink: 0;
 }
 .panel-info h3 { margin-top: 0; font-size: calc(var(--cell-size) * 0.45); text-decoration: underline; margin-bottom: 10px;}
 .dato-fila { display: flex; margin-bottom: 8px; font-size: calc(var(--cell-size) * 0.4); }
@@ -92,6 +86,23 @@
 .dato-valor { color: #2c5282; font-weight: bold; }
 
 .par-doble { display: flex; flex-direction: column; }
+
+/* Clases de estructura que tienes en tu Mapa.js */
+.fila-superior {
+    align-items: flex-end;
+    margin-bottom: calc(var(--cell-size) * 0.8);
+    flex-wrap: nowrap;
+}
+.caja-escala-wrapper { margin-right: calc(var(--cell-size) * 0.6); }
+.zona-media-derecha {
+    align-items: flex-start;
+    margin-left: calc(var(--cell-size) * 6.7);
+    flex-wrap: nowrap;
+}
+.fila-inferior {
+    margin-top: calc(var(--cell-size) * 1.25);
+    flex-wrap: nowrap;
+}
 
 .tooltip-flotante {
   position: fixed; 
@@ -106,26 +117,4 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   min-width: 150px;
   backdrop-filter: blur(4px); 
-}
-
-/* ==============================================================
-   🖥️ EL CEREBRO RESPONSIVO (VIEWPORT WIDTH)
-   ============================================================== */
-
-/* Laptops Estándar y Laptops Pequeños (1000px a 1600px) */
-@media screen and (max-width: 1600px) {
-  :root {
-    /* Magia Negra: La celda medirá exactamente el 2% del ancho de la pantalla.
-       Si el laptop es más chico, la celda se achica proporcionalmente al instante. */
-    --cell-size: 1.8vw; 
-  }
-}
-
-/* Tablets en vertical y Celulares (menor a 1000px) */
-@media screen and (max-width: 999px) {
-  :root {
-    /* En celulares detenemos la reducción fluida para que el guardia pueda tocar las celdas 
-       con sus dedos. Activamos el tamaño táctil mínimo (26px). */
-    --cell-size: 26px; 
-  }
 }

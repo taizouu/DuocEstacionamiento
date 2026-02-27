@@ -130,13 +130,23 @@ return (
     return (
         <div className="contenedor-principal" style={{ position: 'relative' }}>
             
-            {/* === POP-UP / TOOLTIP === */}
+    {/* === POP-UP / TOOLTIP === */}
             {tooltip.visible && datosOcupante && (
                 <div 
                     className="tooltip-flotante" 
                     style={{ 
-                        top: tooltip.y + 15, 
-                        left: tooltip.x + 15, 
+                        // 1. Si está cerca del borde inferior, lo posicionamos arriba del mouse (y - 15), sino abajo (y + 15)
+                        top: tooltip.y > window.innerHeight - 250 ? tooltip.y - 15 : tooltip.y + 15, 
+                        // 2. Si está cerca del borde derecho, lo posicionamos a la izquierda del mouse (x - 15), sino a la derecha (x + 15)
+                        left: tooltip.x > window.innerWidth - 250 ? tooltip.x - 15 : tooltip.x + 15,
+                        // 3. Utilizamos transform para invertir la dirección en la que crece el recuadro
+                        transform: `translate(${
+                            tooltip.x > window.innerWidth - 250 ? '-100%' : '0'
+                        }, ${
+                            tooltip.y > window.innerHeight - 250 ? '-100%' : '0'
+                        })`,
+                        // Agregamos una pequeña transición para que el cambio sea suave
+                        transition: 'transform 0.1s ease-out, top 0.1s, left 0.1s'
                     }}
                 >
                     <div style={{ borderBottom: '1px solid rgba(255,255,255,0.3)', paddingBottom: '5px', marginBottom: '5px', fontWeight: 'bold', textTransform: 'uppercase', color: '#FFB500' }}>
@@ -210,9 +220,8 @@ return (
                     
                     {/* FILA SUPERIOR (1 al 22) */}
                     {/* REFACTOR: Cambiamos 25px por calc(var(--cell-size) * 0.8) */}
-                    <div className="flex-row" style={{ alignItems: 'flex-end', marginBottom: 'calc(var(--cell-size) * 0.8)' }}>
-                        {/* REFACTOR: Cambiamos 20px por calc(var(--cell-size) * 0.6) */}
-                        <div style={{ marginRight: 'calc(var(--cell-size) * 0.6)' }}><ZonaAzul texto="Caja Escala" w={2} h={2} /></div>
+                    <div className="flex-row fila-superior">
+                        <div className="caja-escala-wrapper"><ZonaAzul texto="Caja Escala" w={2} h={2} /></div>
                         <div className="flex-col">
                             <ZonaAzul texto="Bodegas" w={8} h={1} />
                             <div className="flex-row">
@@ -256,8 +265,7 @@ return (
                         </div>
 
                         {/* ZONA MEDIA-DERECHA (23-46) */}
-                        {/* REFACTOR: Cambiamos 215px por calc(var(--cell-size) * 6.7) */}
-                        <div className="flex-row" style={{ alignItems: 'flex-start', marginLeft: 'calc(var(--cell-size) * 6.7)' }}>
+                        <div className="flex-row zona-media-derecha">
                             <div className="flex-col">
                                 {[23,24,25,26,27,28,29,30,31,32].map(n => <Celda key={n} id={String(n)} />)}
                                 {/* REFACTOR: Cambiamos 32px por var(--cell-size) */}
@@ -279,7 +287,7 @@ return (
 
                     {/* FILA INFERIOR (47-73) */}
                     {/* REFACTOR: Cambiamos 40px por calc(var(--cell-size) * 1.25) */}
-                    <div className="flex-row" style={{ marginTop: 'calc(var(--cell-size) * 1.25)' }}> 
+                    <div className="flex-row fila-inferior">
                         {[73,72,71,70,69,68,67].map(n => <Celda key={n} id={String(n)} />)}
                         <Celda id="66" w={3} />
                         {[65,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47].map(n => <Celda key={n} id={String(n)} />)}

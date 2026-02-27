@@ -26,7 +26,7 @@ class RegistroMovimiento(models.Model):
     TIPO_SALIDA_CHOICES = [
         ('NORMAL', 'Salida Normal (Escáner)'),
         ('MANUAL', 'Liberación Manual (Admin/Guardia)'),
-        ('FORZADA', 'Reubicación / Otro'),
+        ('AUTOMATICA', 'Liberación Automática Nocturna'),
     ]
     
     tipo_salida = models.CharField(

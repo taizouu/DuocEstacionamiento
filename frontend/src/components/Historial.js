@@ -147,8 +147,19 @@ const Historial = () => {
                                       >
                                           ⚠️ MANUAL
                                       </span>
+                                  /* Condición 2: Liberación Automática Nocturna (¡NUEVO!) */
+                                  ) : r.tipo_salida === 'AUTOMATICA' ? (
+                                      <span style={{ 
+                                          background: '#e8eaf6', color: '#283593', border: '1px solid #c5cae9',
+                                          padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 'bold',
+                                          display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'default'
+                                      }}
+                                      title="Liberado por limpieza nocturna del sistema"
+                                      >
+                                          🌙 AUTOMÁTICO
+                                      </span>
                                   ) : (
-                                      <span style={{ color: '#aaa', fontSize: '10px', fontStyle: 'italic' }}>📱 Escáner</span>
+                                      <span style={{ color: '#aaa', fontSize: '12px', fontStyle: 'italic' }}>📱 Escáner</span>
                                   )}
                               </div>
                           </div>

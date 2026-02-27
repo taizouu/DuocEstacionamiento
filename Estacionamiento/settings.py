@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 from datetime import timedelta
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
+from celery.schedules import crontab
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -59,7 +60,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', # <--- Bloquea todo por defecto (seguridad)
+        'rest_framework.permissions.IsAuthenticated', 
     ),
 }
 
@@ -160,3 +161,29 @@ CORS_ALLOWED_ORIGINS = [
 
 # Opción 2 (Rápida para probar): Permitir TODO (Cambiar a Opción 1 cuando salgas a producción real)
 # CORS_ALLOW_ALL_ORIGINS = True
+
+# --- CONFIGURACIÓN DE CELERY Y REDIS ---
+# Como usaremos Docker, el host se llamará 'redis'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_TIMEZONE = TIME_ZONE # Usa la misma zona horaria de tu Django
+
+# --- CONFIGURACIÓN DE CELERY BEAT (EL RELOJ) ---
+CELERY_BEAT_SCHEDULE = {
+    'limpieza-nocturna-automatica': {
+        'task': 'mapaestacionamiento.tasks.limpiar_estacionamientos_nocturno',
+        'schedule': crontab(minute=0, hour=0), 
+    },
+    # --- NUEVA TAREA AUTOMÁTICA ---
+    'enviar-reporte-diario': {
+        'task': 'mapaestacionamiento.tasks.enviar_reporte_diario',
+        'schedule': crontab(minute=5, hour=0), # Se ejecuta a las 23:50 todos los días
+    },
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' # Cambiar a smtp.office365.com si usas Outlook/Duoc
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')

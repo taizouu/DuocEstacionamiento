@@ -40,5 +40,40 @@ services:
     depends_on:
       - backend
 
+  # ==========================================
+  # 4. EL BUZÓN DE MENSAJES (Redis)
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # ==========================================
+  # 5. EL COCINERO (Celery Worker - Ejecutor)
+  # ==========================================
+  celery_worker:
+    build: .  # Usa el mismo código base que el backend
+    command: celery -A Estacionamiento worker -l info
+    restart: always
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env  # Necesita las mismas credenciales de BD que el backend
+
+  # ==========================================
+  # 6. EL GERENTE (Celery Beat - Reloj)
+  # ==========================================
+  celery_beat:
+    build: .  # Usa el mismo código base que el backend
+    command: celery -A Estacionamiento beat -l info
+    restart: always
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env  # Necesita las mismas credenciales de BD que el backend
+
 volumes:
   postgres_data:
