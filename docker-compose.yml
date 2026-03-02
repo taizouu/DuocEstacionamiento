@@ -15,19 +15,28 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # ---- AGREGAR ESTO ----
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d EstacDuoc"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # ==========================================
   # 2. CEREBRO (Tu Proyecto Django - Raíz)
   # ==========================================
   backend:
-    build: .  # El punto significa: "Construye usando el Dockerfile de ESTA misma carpeta"
+    build: . 
+    command: python manage.py runserver 0.0.0.0:8000
     restart: always
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     env_file:
-      - .env  # Lee el .env que está en esta misma raíz
+      - .env
+    # ---- CAMBIAR DEPENDS_ON A ESTO ----
+    depends_on:
+      db:
+        condition: service_healthy
 
   # ==========================================
   # 3. INTERFAZ (Tu Panel de React)

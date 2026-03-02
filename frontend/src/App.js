@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import './assets/App.css'; 
 
 // --- IMPORTAMOS VISTAS ---
-import Monitor from './pages/Public/Monitor'; // Tu nueva vista pública
+import Monitor from './pages/Public/Monitor'; 
 import Login from './pages/Auth/Login';
 
 // --- PANELES ---
@@ -11,7 +11,7 @@ import PanelAdmin from './pages/Dashboard/PanelAdmin';
 import PanelGuardia from './pages/Dashboard/PanelGuardia';
 import PanelVisor from './pages/Dashboard/PanelVisor';
 import PanelProfesor from './pages/Dashboard/PanelProfesor';
-import Mapa from './components/Mapa'; // Fallback
+import Mapa from './components/Mapa'; 
 
 // ==========================================
 // COMPONENTE: RUTA PRIVADA (Dashboard)
