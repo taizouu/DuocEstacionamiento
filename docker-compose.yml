@@ -8,36 +8,28 @@ services:
     image: postgres:14-alpine
     restart: always
     environment:
-      POSTGRES_DB: EstacDuoc  # Revisa que coincida con tu .env
-      POSTGRES_USER: postgres      # Revisa que coincida con tu .env
-      POSTGRES_PASSWORD: Heavensdoa1502! # Revisa que coincida con tu .env
+      POSTGRES_DB: EstacDuoc
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Heavensdoa1502!
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # ---- AGREGAR ESTO ----
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s  # Le damos 20 segundos de gracia para que inicialice el disco
 
   # ==========================================
   # 2. CEREBRO (Tu Proyecto Django - Raíz)
   # ==========================================
   backend:
     build: . 
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py wait_for_db && python manage.py runserver 0.0.0.0:8000"
+    # VAMOS A CAMBIAR EL COMANDO EN EL PASO 3
     restart: always
     ports:
       - "8000:8000"
+    depends_on:
+      - db  # Solo un depends_on normal
     env_file:
       - .env
-    # ---- CAMBIAR DEPENDS_ON A ESTO ----
-    depends_on:
-      db:
-        condition: service_healthy
 
   # ==========================================
   # 3. INTERFAZ (Tu Panel de React)
