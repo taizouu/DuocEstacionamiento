@@ -28,14 +28,12 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hxgi2@w8*y4)w2*h463w)3bs8^juw39236nuce9fs4v!2#xry)'
+SECRET_KEY = 'SECRET_KEY'= os.getenv('SECRET_KEY'),
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# settings.py
-# Agrega la IP de tu servidor y localhost por si acaso
-ALLOWED_HOSTS = ['10.208.0.60', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['10.208.0.60', 'localhost']
 
 
 # Application definition
@@ -156,7 +154,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1",
     "http://10.208.0.60",
-    #"http://192.168.3.144:3000", # Si tu frontend corre en el puerto 3000
+    "http://10.208.0.60:3000", # Si tu frontend corre en el puerto 3000
 ]
 
 # Opción 2 (Rápida para probar): Permitir TODO (Cambiar a Opción 1 cuando salgas a producción real)
