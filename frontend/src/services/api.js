@@ -3,14 +3,14 @@ import axios from 'axios';
 // 1. CONFIGURACIÓN BASE
 // Apuntamos estrictamente a la raíz del servidor.
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://10.208.0.60:8000', 
+    baseURL: process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000', 
     headers: {
         'Content-Type': 'application/json',
     },
     timeout: 10000, 
 });
 
-// 2. INTERCEPTOR DE SOLICITUD (REQUEST) 
+// 2. INTERCEPTOR DE SOLICITUD (REQUEST) 🛡️
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
