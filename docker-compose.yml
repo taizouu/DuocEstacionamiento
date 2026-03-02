@@ -17,10 +17,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
       # ---- AGREGAR ESTO ----
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d EstacDuoc"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s  # Le damos 20 segundos de gracia para que inicialice el disco
 
   # ==========================================
   # 2. CEREBRO (Tu Proyecto Django - Raíz)
