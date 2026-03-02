@@ -10,7 +10,7 @@ const api = axios.create({
     timeout: 10000, 
 });
 
-// 2. INTERCEPTOR DE SOLICITUD (REQUEST) 🛡️
+// 2. INTERCEPTOR DE SOLICITUD (REQUEST) 
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
