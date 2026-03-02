@@ -35,7 +35,7 @@ DEBUG = False
 
 # settings.py
 # Agrega la IP de tu servidor y localhost por si acaso
-ALLOWED_HOSTS = ['192.168.3.144', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['10.208.0.60', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -155,7 +155,7 @@ STATIC_URL = 'static/'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1",
-    #"http://192.168.3.144",
+    "http://10.208.0.60",
     #"http://192.168.3.144:3000", # Si tu frontend corre en el puerto 3000
 ]
 
