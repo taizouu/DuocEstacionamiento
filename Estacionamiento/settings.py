@@ -151,10 +151,10 @@ STATIC_URL = 'static/'
 ###STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CORS_ALLOWED_ORIGINS = [
-    "http://10.208.0.60",       # <-- Este es el correcto para tu React actual
-    "http://10.208.0.60:3000",  # (Déjalo solo si usas el puerto 3000 en desarrollo local)
+    "http://localhost:3000",
+    "http://127.0.0.1",
+    "http://10.208.0.60",
 ]
-
 # Opción 2 (Rápida para probar): Permitir TODO (Cambiar a Opción 1 cuando salgas a producción real)
 # CORS_ALLOW_ALL_ORIGINS = True
 
